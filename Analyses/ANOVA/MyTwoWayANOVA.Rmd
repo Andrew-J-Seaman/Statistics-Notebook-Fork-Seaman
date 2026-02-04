@@ -1,26 +1,17 @@
 ---
-title: "My Two-way ANOVA"
+title: "My Two-way ANOVA: Study Hours"
+subtitle: "W06 Analysis"
+author: "Andrew Seaman"
+date: "25-Oct-2025"
 output: 
   html_document:
     theme: cerulean
     code_folding: hide
 ---
 
-```{r, warning=FALSE, message=FALSE}
-library(mosaic)
-library(DT)
-library(pander)
-library(car)
-library(tidyverse)
+<!-- ————————————————————————————————————————————————————————————————————————
 
-# Record your data from your own mini experiment in Excel.
-# Save the data as a .csv file in the Data folder of the Statistics-Notebook.
-
-# Read in the data
-someNameYouWant <- read_csv("../../Data/whatYouNamedYourDataGoesHere.csv") 
-```
-
-<!-- Instructions:
+INSTRUCTIONS:
 
 Perform your own mini experiment using two factors that each have at least two levels. Analyze your data using a two-way ANOVA.
 
@@ -28,9 +19,618 @@ Studying reaction time is recommended because the data is quickly collected.
 
 While you should use the warpbreaks example analyses as your guide on how to properly complete this analysis, you should also be creative in your final delivery of this analysis. If you copy the format and approach of the example analyses, be sure to give credit in your document to these example analyses. You could write something like, "This work is modeled after the [warpbreaks](https://byuistats.github.io/Statistics-Notebook/Analyses/ANOVA/Examples/warpbreaksTwoWayANOVA.html) analysis." Whatever you do, DO NOT use any of the written statements from the example analyses in your analysis unless you quote them directly and give credit. Using someone else's writing as your own without giving credit to the original author is plagiarism and is an Honor Code Violation. So do your own work. Plus, the more you try to write things in your own words, the more you will learn. Also, note that there aren't really any "rules" about exactly how your document should be organized. So be creative and organize your file in a way that makes sense to you, but still has all important elements.
 
+———————————————————————————————————————————————————————————————————————— -->
+
+<!-- Format HTML Rendering -->
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- Libraries -->
+```{r, warning=FALSE, message=FALSE}
+library(mosaic)
+library(DT)
+library(pander)
+library(car)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(lattice) # ChatGPT recommended using this library to help creat the graphics.
+```
+
+<!-- Data Import -->
+```{r}
+# ————————————————————————————————————————————————————————————————————————
+# Record your data from your own mini experiment in Excel.
+# Save the data as a .csv file in the Data folder of the Statistics-Notebook.
+# ————————————————————————————————————————————————————————————————————————
+
+# Read in the data
+source <- read.csv("../../Data/StudyHours/StudyHours_with_zeros.csv")
+
+# Data columns: actual data used for the analysis.
+# Cleaning: Rename (if needed) and assign correct data types.
+StudyHours <- source %>%
+  rename(Weekday = Day) %>%
+  mutate(
+    Date = dmy(Date),                                # Convert to Date type
+    Weekday = factor(Weekday,
+                     levels = c("Monday", "Tuesday", "Wednesday", 
+                                "Thursday", "Friday", "Saturday", "Sunday")),
+    Week = as.integer(Week),
+    Course_Code = as.character(Course_Code),
+    Credits_Hours = as.integer(Credits_Hours),
+    RecHr_Weekly = as.integer(RecHr_Weekly),
+    RecHr_Daily = as.numeric(RecHr_Daily),           # Numeric (float)
+    Hours = as.numeric(Hours),
+    Met_RecHr_Weekly = as.logical(Met_RecHr_Weekly), # Convert to TRUE/FALSE
+    Sick = as.logical(Sick)                          # Convert to TRUE/FALSE
+  ) %>%
+  filter(!is.na(Hours)) %>%                          # remove rows with NA in Hours
+  select(-Notes, -Hex_Code, -Course_Name)
+
+# Reference columns: 
+Color_Guide <- source %>% 
+  select(Course_Code, Hex_Code) %>% 
+  slice_head(n = 5)
+```
+
+<BR />
+
+## Background {.tabset .tabset-fade}
+
+### Show
+
+During the Winter Semester of 2024 (Jan 8th - Apr 10th) Andrew Seaman (*the Student*), a student at Brigham Young University — Idaho, recorded his study hours (not including in-class study time). Through rigorous employment of a personal calendar the Student tracked their study hours per day and per course. The Student's **course load** included:
+
+```{r}
+# Course Load Table: pull out the needed columns and add a "Total" row.
+
+course_load <- source %>%
+  slice_head(n = 5) %>%
+  transmute(
+    Code = Course_Code,
+    Name = Course_Name,
+    `Credit Hours` = Credits_Hours,
+    `Rec. Weekly Study Hours` = RecHr_Weekly
+  ) %>%
+  { df <- .;
+    add_row(
+      df,
+      Code = "Total",
+      Name = as.character(nrow(df)),            # course count
+      `Credit Hours` = sum(df$`Credit Hours`, na.rm = TRUE),
+      `Rec. Weekly Study Hours` = sum(df$`Rec. Weekly Study Hours`, na.rm = TRUE)
+    )
+  }
+
+pander(course_load, justify = c("left", "left", "center", "center"))
+```
+_Note: it is recommended by the University to estimate weekly study hours for a course equal to "credit hours * (times) 3"._
+
+The Student shared they began this project out of personal necessity to make his time management skill development visible so he could better approach learning how he used his time, when, and where. He added it was deeply insightful to glimpse even basic statistics as a result of his "personal study" however he is now interested in determining which factors may have had significant impact on the distribution of his time spent studying.
+
+<!-- End of the tabset (background) -->
+### Hide
+
+<BR />
+
+<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+## Analysis {.tabset .tabset-fade}
+
+### Hypotheses
+
+The data was recorded for each course per day per week meaning the day of the week (`Weekday`) as well as the course (`Course`) are interesting factors which may have had significant impact on the distribution of study hours. Due to this multi-factored interaction it is most appropriate to use a <u>two-way ANOVA</u> test to evaluate the influence of each factor separately and jointly.
+
+#### Set 1: **Weekday** (One-way ANOVA)
+Hypotheses about Weekday where $\mu$ represents the mean number of hours studied outside of class time.
+$$
+H_0:\ \mu_{\text{Mon}}=\mu_{\text{Tue}}=\cdots=\mu_{\text{Sun}}
+\\
+H_a:\ \text{not all } \mu_k \text{ are equal.}
+$$
+
+#### Set 2: **Course:** (One-way ANOVA)
+Hypotheses about Course where $\mu$ represents the mean number of hours studied outside of class time.
+
+<!-- Courses: ACCTG 201, CSE 111, MATH 101, MATH 221, MKT 275 -->
+
+<!-- $$ -->
+<!-- H_0:\ \mu_{\text{1}}=\cdots=\mu_{\text{5}} -->
+<!-- \\ -->
+<!-- H_a:  \mu_\text{i} \ne \mu \space \text{for at least one i} \space \in \text{{1 = ACCTG 201, 2 = CSE 111, 3 = MATH 101, 4 = MATH 221, 5 = MKT 275}} -->
+<!-- $$ -->
+
+$$
+H_0:\ \mu_{\text{ACCTG201}}=\mu_{\text{MATH101}}=\mu_{\text{CSE111}}=\mu_{\text{MKT275}}=\mu_{\text{MATH221D}} \\
+H_a:\ \text{not all } \mu_k \text{ are equal.}
+$$
+
+#### Set 3: **Weekday:Course** (Two-way ANOVA)
+Hypotheses about the interaction of Weekday and Course.
+$$
+H_0: \text{The effect of Weekday on Hours is the same for all levels of Course.} 
+\\
+H_a: \text{The effect of Weekday on Hours is not the same for all levels of Course.}
+$$
+
+A significance level of $\alpha$ = 0.05 will be used for this study.
+
+<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+<BR /> <BR /> <BR />
+
+### Two-way ANOVA
+
+We will analyze the hypothesized significance of the two factors by computing the following Two-way ANOVA test.
+
+```{r}
+# Two-way ANOVA:
+
+hours_aov <- aov(Hours ~ Weekday + Course_Code + Weekday:Course_Code, data = StudyHours)
+
+results_aov <- summary(hours_aov)
+
+# Raw output:
+# results_aov
+
+# Clean output:
+pander(results_aov, 
+       justify = c("left", "center", "center", "center", "center", "center"))
+```
+
+For interpretation we first ask,"*Which p-values were significant?*" In this case we have three tests. Each factor was run through a one-way ANOVA test and then jointly the pair of factors were used in the two-way ANOVA test.  All three tests are showing significance (p-value < $\alpha$ = 0.05):
+
+* **Weekday:** p-value = 0.001142
+* **Course_Code (or Course):** p-value = 0.0008493 
+* **Weekday:Course:** p-value = 0.006241
+
+</BR>
+
+#### Diagnostic Plots
+
+<!-- Source: Author -->
+<!-- In evaluating the appropriateness of an ANOVA test two criteria must be checked: the data must be normal and the variance between the levels of a factor must be the same. Based on the plots below it is clear the data is most likely not normal. Additionally, the radial, dish-like shape of the data points in the left plot do not demonstrate a balanced distribution about zero further casting doubt on the likelihood an ANOVA test can accurately model the data. -->
+
+*(Disclosure - Source: ChatGPT (sharpening Author's explanation))*
+
+In evaluating the appropriateness of an ANOVA, two main assumptions must be met:
+
+1) The residuals should be normally distributed.
+2) The variance of residuals should be constant across all levels of the factors (homoscedasticity).
+
+The Q-Q plot shows substantial deviation from the diagonal, especially in the tails, indicating non-normal residuals. The Residuals vs Fitted plot displays a curved, “fan-shaped” pattern rather than random scatter, indicating heteroscedasticity. These violations suggest that the ANOVA results should be <span style="background:yellow;"><strong>interpreted with caution</strong></span>, as the model assumptions are not well met.
+
+```{r}
+par(mfrow=c(1,2))
+plot(hours_aov, which=1:2, pch=16)
+```
+
+<BR /> <BR /> <BR />
+
+<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+### Graphics and Numerical Summaries {.tabset .tabset-fade}
+
+The three following graphics with accompanying numerical summaries visualize the test results against each set of hypotheses. 
+
+<div style="color:red;">Again, these results should be interpreted with caution.</div>
+
+</BR>
+
+#### Weekday
+
+<!-- Chart (1) -->
+```{r}
+# ————————————————————————————————————————————————————————————————————————
+# NOTE 1: 
+
+# Originally I created this plot but it wasn't tracing the means across the continuous axis (Weekday). 
+# I wanted this because it would reveal study habits across the course of the week. 
+# So, ChatGPT gave me the commented out code for a plot which adds the line as I desired. 
+# It also adds a few other styling elements such as marking the mean with a filled marker and thickening the line.
+
+# NOTE 2: 
+
+# However, I figured out I needed to update my data cleaning up above to remove records with null values in the "Hours" column. 
+# This solved the problem.
+# ————————————————————————————————————————————————————————————————————————
+
+# Code source: author
+xyplot(Hours ~ Weekday,
+       data = StudyHours,
+       type = c("p", "a"), # points and averages
+       main = "Study Hours by Weekday",
+       xlab = "Weekday",
+       ylab = "Number of Study Hours")
+
+
+
+# Code Source: ChatGPT (didn't end up)
+# xyplot(Hours ~ Weekday, data = StudyHours,
+#        main = "Study Hours by Weekday",
+#        xlab = "Weekday", ylab = "Number of Study Hours",
+#        panel = function(x, y, ...) {
+#          # points
+#          panel.stripplot(x, y, jitter.data = TRUE, factor = 0.6, pch = 1, ...)
+#          # means
+#          means <- tapply(y, x, mean, na.rm = TRUE)
+#          panel.lines(seq_along(means), means, lwd = 2)
+#          panel.points(seq_along(means), means, pch = 16, cex = 1.1)
+#        })
+```
+
+<!-- 
+Chart (1) Description
+---
+
+Version 1:
+
+This first graphic shows overall, more studying occurs at the beginning of the week than at the end of the week with a crest on Wednesday. According to the Student's records, this is likely related to when certain classes had deadlines as well as the structure of the course. For example. ACCTG 201 (Financial Accounting) opened all assignments for the duration of the week with everything due the same day each week. Addition factors could also be related to how the Student felt during the middle of the week as opposed to the beginning or the end. The Student appears to be more energized or focused earlier in the week with that energy dying off towards the weekend. These assumptions would align well with popular opinion regarding energy levels during the week where individuals use the weekend to "recharge" so they can start the week off refreshed but find it takes some time to ramp back up to peak productivity. 
+
+Version 2: (below)
+-->
+
+This dot plot shows a clear variation in study hours across days of the week, with the highest concentration of study time occurring midweek, particularly on Wednesdays. Fewer hours were logged on weekends, especially Saturday. The smooth line trend suggests a midweek peak followed by a weekend drop.
+
+<!-- Numerical Summary (1) -->
+```{r}
+# Disclosure: ChatGPT helped me learn how to include a standard deviation value that has three digits after the decimal in a compatible manner with pander().
+
+favstats(Hours ~ Weekday, data = StudyHours) %>% 
+  select(Weekday, mean, sd) %>% 
+  mutate(
+    Mean = mean,
+    SD = sprintf("%.3f", sd) # <------- Source: ChatGPT
+  ) %>% 
+  select(Weekday, Mean, SD) %>% 
+  pander(
+    justify = c("left", "center", "center"),
+    caption = "Mean and SD of Study Hours by Weekday"
+  )
+```
+
+Wednesday had both the highest mean (1.807 hrs) and the highest standard deviation (2.882), indicating it was not only the most studied day but also showed wide variation in study duration by the Student. In contrast, Saturday had the lowest mean (0.4446 hrs) and a low standard deviation (1.283), suggesting more consistently low study hours. The standard deviations reflect how the Student’s weekday study behavior varied more from week to week than it did on weekends.
+
+<BR /> <BR /> <BR />
+
+#### Course
+
+<!-- Chart (2) -->
+```{r}
+xyplot(Hours ~ as.factor(Course_Code),
+       data = StudyHours,
+       type = c("p", "a"), # points and averages
+       main = "Study Hours by Course",
+       xlab = "Course",
+       ylab = "Number of Study Hours")
+```
+
+The plot displays individual study time per course, with MATH 101 and ACCTG 201 having the highest visible clusters of study hours. CSE 111 consistently shows the lowest study hour values with minimal spread.
+
+<!-- Numerical Summary (2) -->
+```{r}
+# Disclosure: ChatGPT helped me learn how to include a standard deviation value that has three digits after the decimal in a compatible manner with pander().
+
+favstats(Hours ~ Course_Code, data = StudyHours) %>% 
+  select(Course_Code, mean, sd) %>% 
+  mutate(
+    Mean = sprintf("%.3f", mean),
+    SD = sprintf("%.3f", sd) # <------- Source: ChatGPT
+  ) %>% 
+  select(Course_Code, Mean, SD) %>% 
+  pander(
+    justify = c("left", "center", "center"),
+    caption = "Mean and SD of Study Hours by Course"
+  )
+```
+
+MATH 101 had the highest mean study time (1.557 hrs), followed by ACCTG 201 (1.288 hrs), suggesting those courses required or received more attention. CSE 111 had the lowest mean (0.366 hrs) and the smallest standard deviation (1.193), suggesting less time spent and more consistency in study habits. Larger standard deviations for MATH 101 and ACCTG 201 (2.425 and 2.363, respectively) indicate broader variability in how the Student approached those courses.
+
+<BR /> <BR /> <BR />
+
+#### Course:Weekday
+
+<!-- Chart (3) -->
+```{r}
+# ————————————————————————————————————————————————————————————————————————
+# DISCLOSURE: 
+
+# I wrote the majority of the code below but did not know how to use a reference dataframe to build a color palette and insert it into the plot code to color the secondary geometry ("line"). 
+# ChatGPT aided me by showing me how to first define the color pallet and then where to insert it into the plot's code.
+# ————————————————————————————————————————————————————————————————————————
+
+# ATTEMPT 1: (source: Author)
+
+# xyplot(Hours ~ as.factor(Weekday),
+#        data = StudyHours,
+#        group = as.factor(Course_Code),    # sets legend groups
+#        type = c("p", "a"),                # points and averages
+#        auto.key = TRUE,                   # automatically generates legend
+#        main = "Study Hours by Weekday and Course",
+#        xlab = "Weekday",
+#        ylab = "Number of Study Hours")
+
+
+
+# ATTEMPT 2: (source: Author)
+
+# ggplot(StudyHours, aes(x=Weekday, y=Hours, group=Course_Code, color = Course_Code)) +
+#   geom_point(color = "skyblue") +
+#   scale_fill_manual(aes(Color_Guide, color = Hex_Code)) +
+#   stat_summary(fun="mean", geom="line") +
+#   labs(
+#     title="Placeholder",
+#     x="Weekday (colored by Course)",
+#     y="Number of Study Hours"
+#   ) +
+#   theme_bw()
+
+
+
+# ATTEMPT 3: (source: ChatGPT (modifying Author's code))
+# Additions: ChatGPT showed me how to add a jitter effect to the point geometry.
+
+# palette: "course code" → "#hex"
+pal <- with(Color_Guide, setNames(Hex_Code, Course_Code))
+
+ggplot(StudyHours, aes(Weekday, Hours, group = Course_Code, color = Course_Code)) +
+  geom_jitter(width = 0.2, height = 0, pch = 21) +
+  stat_summary(fun = "mean", geom = "line", linewidth = 0.7) +
+  scale_color_manual(values = pal, name = "Course") +
+  labs(
+    title = "Significance of the Interaction",
+    x = "Weekday",
+    y = "Number of Study Hours"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face="bold", hjust = .5, size = 16),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank()
+  )
+```
+
+The interaction plot indicates *varying* patterns for each course across the week. Notably, MKT 275 spikes on Wednesday and ACCTG 201 is higher on Monday and Wednesday. These patterns suggest that study habits are not consistent across courses and are influenced by the day of the week.
+
+<!-- Numerical Summary (3) -->
+```{r}
+# ————————————————————————————————————————————————————————————————————————
+# DISCLOSURE: 
+
+# I wrote the commented out code however I am still learning how to pivot data so I relied on ChatGPT to modify my code to accomplish this so the data was wide not long thus greatly simplifying the viewing experience and data intake for the reader.
+# ————————————————————————————————————————————————————————————————————————
+
+# Source: Author
+# numSummary <- StudyHours %>% 
+#   group_by(Weekday, Course_Code) %>% 
+#   summarise(
+#     `Mean Study Hours` = round(mean(Hours, na.rm = TRUE), 2),
+#     .groups = "drop"
+#   )
+# 
+# pander(numSummary)
+
+
+# Code Source: ChatGPT (modifying Author's code)
+
+## Mean table
+meanSummary_wide <- StudyHours %>%
+  group_by(Course_Code, Weekday) %>%
+  summarise(`Mean Study Hours` = sprintf("%.2f", mean(Hours, na.rm = TRUE)), .groups = "drop") %>%
+  pivot_wider(names_from = Weekday, values_from = `Mean Study Hours`)
+
+pander(meanSummary_wide,
+       justify = c("left", rep("right", 7)),
+       caption = "Mean of Study Hours by Course and Weekday (formatted to 2 decimal places)")
+```
+
+Study hours vary greatly between courses on specific days. For example, MKT 275 peaks on Wednesday (3.00 hrs), while CSE 111 is consistently low across the board. This supports the presence of an interaction effect where both course and weekday jointly influence study hours.
+
+```{r}
+## SD table
+sdSummary_wide <- StudyHours %>%
+  group_by(Course_Code, Weekday) %>%
+  summarise(`SD Study Hours` = sprintf("%.2f", sd(Hours, na.rm = TRUE)), .groups = "drop") %>%
+  pivot_wider(names_from = Weekday, values_from = `SD Study Hours`)
+
+pander(sdSummary_wide,
+       justify = c("left", rep("right", 7)),
+       caption = "SD of Study Hours by Course and Weekday (formatted to 2 decimal places)")
+```
+
+The standard deviation table reveals substantial variation in study consistency across courses and weekdays. For instance, MKT 275 has a large standard deviation on Wednesday (3.57 hrs), reflecting high fluctuation in study time despite its high average. Similarly, ACCTG 201 and MATH 101 also show large standard deviations (3.18 and 3.28 hrs respectively) on Monday and Friday, suggesting that while these days may see higher study volumes, the duration varies widely. In contrast, CSE 111 consistently shows low standard deviations across all days, indicating steady but minimal study time regardless of the weekday. These differences highlight not only how much time is spent studying but also how reliably that time is spent from day to day within each course.
+
+<BR /> <BR /> <BR />
+
+<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+### Conclusion
+
+The interaction plot and accompanying summaries demonstrate that both the day of the week and the course influence study behavior, confirming the presence of an interaction effect. Courses like MKT 275 and ACCTG 201 show sharp peaks on specific days (e.g., Wednesday and Monday), while CSE 111 remains consistently low across the week. The inclusion of standard deviations further emphasizes that some courses exhibit highly variable study patterns (e.g., MATH 101), whereas others show steady routines. These findings support the conclusion that study habits are not uniform and are shaped by the combined influence of course demands and scheduling tendencies throughout the week.
+
+---
+
+Despite violations of normality and homoscedasticity assumptions, the ANOVA results suggest significant effects for:
+
+* Weekday (p = 0.001142)
+* Course (p = 0.0008493)
+* Weekday × Course Interaction (p = 0.006241)
+
+This means the data provides evidence that study hours differ not only by day of the week and by course but also that the effect of weekday depends on the course—some courses are studied more on specific days than others.
+
+However, due to non-normal residuals and unequal variances, these results should be interpreted with caution. A non-parametric or transformation-based approach may offer more robust conclusions in future analyses.
+
+<BR /> <BR /> <BR />
+
+<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+<!-- NOTE: this exploratory section is not very relevant to the primary aim of this analysis.
+
+## Extra {.tabset .tabset-fade}
+
+### Hide
+
+*Click through the tabs to view details.*
+
+### Statistical Summary (Study Hours)
+```{r, warning=FALSE}
+# Generate summary
+summary_studyHours <- StudyHours %>%
+  group_by(Course_Code) %>%
+  summarise(
+    # Compute TOTAL study hours
+    total_hr = sum(Hours, na.rm = TRUE),
+    # Compute MEAN study hours
+    mean_hr = mean(Hours, na.rm = TRUE),
+    # Compute MAX study hours
+    max_hr = max(Hours, na.rm = TRUE),
+    # Compute MIN non-zero study hours
+    min.nonzero_hr = min(Hours[Hours != 0], na.rm = TRUE),
+    # Compute ST.DEV study hours
+    st.dev_hr = sd(Hours, na.rm = TRUE)
+  )
+
+# Print table with alignment settings
+pander(summary_studyHours,
+       justify = c("left", "right", "right", "right", "right", "right"))
+```
+
+Graphic 1
+```{r}
+# df <- summary_studyHours
+# 
+# ggplot(data=mean_studyHours, aes(x=Course, y=mean_hours)) +
+#   geom_bar(stat = "identity")
+```
+
+
+### Summary Graphics
+
+**Graphic T1**
+```{r}
+summary_studyHours %>%
+  pivot_longer(cols = c(total_hr, mean_hr, max_hr, min.nonzero_hr, st.dev_hr),
+               names_to = "Metric", values_to = "Value") %>%
+  ggplot(aes(x = Course_Code, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Study Hours by Course and Metric",
+       x = "Course",
+       y = "Hours") +
+  theme_minimal()
+```
+
+**Graphic T2**
+```{r}
+summary_studyHours %>%
+  pivot_longer(cols = c(total_hr, mean_hr, max_hr, min.nonzero_hr, st.dev_hr),
+               names_to = "Metric", values_to = "Value") %>%
+  ggplot(aes(x = Metric, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Course_Code, scales = "free_y") +
+  labs(title = "Study Hours Metrics by Course",
+       x = "Metric",
+       y = "Hours") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+**Graphic T3**
+```{r}
+# Join Color Guide to summary_studyHours
+summary_studyHours <- summary_studyHours %>%
+  left_join(Color_Guide, by = "Course_Code")
+
+# Create faceted bar plot with color mapping and labeled axes
+summary_studyHours %>%
+  pivot_longer(cols = c(total_hr, mean_hr, max_hr, min.nonzero_hr, st.dev_hr),
+               names_to = "Metric", values_to = "Value") %>%
+  ggplot(aes(x = Course_Code, y = Value, fill = Course_Code)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Metric, scales = "free_y", labeller = label_both) +  # Add labels to each facet
+  scale_fill_manual(values = setNames(summary_studyHours$Hex_Code, summary_studyHours$Course_Code)) +
+  labs(title = "Study Hours by Metric Across Courses",
+       x = "Course",
+       y = "Hours") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),  # Ensure x-axis labels appear
+        plot.title = element_text(face = "bold", size = 15, hjust = .5),
+        axis.title.x = element_text(face = "bold", size = 15),
+        axis.title.y = element_text(face = "bold", size = 15),
+        strip.text = element_text(size = 12, face = "bold"),
+        panel.grid.major.x = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank()) +  
+  scale_x_discrete(drop = FALSE)  # Ensure all x-axis labels are displayed
+```
+
 -->
 
 
 
+<!-- 
+
+Explanation:
+
+The purpose of the following two chunks was to verify the averages on the numerical summary for chart 1 (Weekday) are correct. For some reason the values looked off but I learned I was not accounting for the occurrence of so many zero values driving up the divisor value thus reducing the expected mean for, in this case, Wednesday study hours specifically.
+
+Attemps:
+
+```{r}
+# Wednesday Hours Summed by Week
+wed_hrs <- StudyHours %>% 
+  filter(Hours > 0.00, Weekday == "Wednesday") %>% 
+  group_by(Date, Weekday, Week) %>% 
+  summarize(Total_Hours = sum(Hours), .groups = "drop") %>% 
+  arrange(Date)
+
+  pander(wed_hrs)
+  
+  favstats(wed_hrs$Total_Hours)
+
+```
+
+```{r}
+# Wednesday Hours: All Records
+hrs_wed <- StudyHours %>% 
+  filter(Weekday == "Wednesday")
+
+# favstats(hrs_wed$Hours)
+sum <- sum(hrs_wed$Hours)
+rows <- nrow(hrs_wed)
+mean_manual <- sum/rows
+
+cat("Sum (top):", sum,"\n")
+cat("Rows (bottom):", rows,"\n")
+cat("Mean (manual):", mean_manual,"\n")
+```
+
+-->
 
 
+
+<!-- -------- -->
+<!-- FILE END -->
+<!-- -------- -->

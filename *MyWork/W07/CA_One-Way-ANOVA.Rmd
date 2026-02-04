@@ -1,0 +1,102 @@
+---
+title: "One-Way ANOVA"
+subtitle: "Class Activity"
+author: "Andrew Seaman"
+date: "2025-Feb-10"
+output: 
+  html_document:
+    theme: journal
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+<!-- ------ -->
+<!-- SETUP: -->
+<!-- ------ -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+# Load libraries
+library(mosaic)
+library(DT)
+library(pander)
+library(tidyverse)
+```
+
+```{r}
+# Import dataset
+kf <- KidsFeet
+```
+
+<!-- Setup End -->
+
+
+
+
+
+<!-- ---------- -->
+<!-- QUESTIONS: -->
+<!-- ---------- -->
+
+## Questions
+
+Check off the items below as you complete them during today's class:
+
+- [x] I have located the ANOVA content of my Statistics Notebook under the Making Inference menu. 
+- [x] I can explain when to use each of the t Tests, each of the Wilcoxon Tests, and ANOVA. 
+- [x] I can explain the words "factor" and "level" using the airquality dataset as an example. 
+- [x] Using the word "factor" in my explanation, I can explain the difference between a one-way and a two-way ANOVA. 
+- [x] I have reviewed the chickwts (One-way) and warpbreaks (Two-way) example analyses in R and understand how to complete all of the R Code in those files.
+
+<!-- Questions End -->
+
+
+
+
+
+<!-- ---------- -->
+<!-- NOTES: -->
+<!-- ---------- -->
+
+## Factor
+
+**Definition:** A factor is defined as a qualitative variable containing at least two categories. The categories of the factor are referred to as the “levels” of the factor.
+
+By using `as.factor(x)` on the categorical variable we can treat it as data type factor.
+
+View the data types with either `str()`.`glimpse()`.
+
+```{r}
+# a. `glimpse()`
+glimpse(kf) %>% pander()
+
+```
+
+
+
+## ANOVA
+
+**Notation:**
+
+You have to run the analysis (`aov()`) and assign it to a variable first (e.g. `myaov`) and then view the summary (`summary(myaov)`).
+
+**One-Way ANOVA:** `myaov <- aov(Y ~ X, data=YourDataSet)`
+
+**Two-Way ANOVA:** `myaov <- aov(Y ~ X1+X2+X1:X2, data=YourDataSet)`
+
+**Summary:** `summary(myaov)`
+
+
+<!-- Notes End -->
+
+
+
+
+
+<!-- -------- -->
+<!-- FILE END -->
+<!-- -------- -->

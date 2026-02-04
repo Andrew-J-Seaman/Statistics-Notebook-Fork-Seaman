@@ -1,0 +1,92 @@
+---
+title: "ANOVA"
+subtitle: "Assesment Quiz"
+author: "Andrew Seaman"
+date: "2025-Aug-4"
+output: 
+  html_document:
+    theme: journal
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+<!-- ------ -->
+<!-- SETUP: -->
+<!-- ------ -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+# Load libraries
+library(mosaic)
+library(DT)
+library(pander)
+library(tidyverse)
+```
+
+<!-- Setup End -->
+
+
+
+
+
+
+
+
+<!-- ---------- -->
+<!-- QUESTIONS: -->
+<!-- ---------- -->
+
+## 1.
+
+<!-- Q1. End -->
+
+
+
+
+
+
+
+
+
+
+## 2.
+
+```{r}
+feet.aov <-  aov(length ~ domhand + sex + domhand:sex, data=KidsFeet)
+
+summary(feet.aov)
+```
+
+<!-- Q2. End -->
+
+
+
+
+
+
+
+
+
+
+## 3.
+
+```{r}
+boys <- KidsFeet[KidsFeet$sex == "B" & KidsFeet$domhand == "L", ]
+mean(boys$length)
+```
+
+<!-- Q3. End -->
+
+
+
+<!-- Questions End -->
+
+
+
+<!-- -------- -->
+<!-- FILE END -->
+<!-- -------- -->

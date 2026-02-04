@@ -1,0 +1,98 @@
+---
+title: "Simple Linear Regression"
+subtitle: "Assesment Quiz"
+author: "Andrew Seaman"
+date: "2025-MM-DD"
+output: 
+  html_document:
+    theme: journal
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+<!-- ------ -->
+<!-- SETUP: -->
+<!-- ------ -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+# Load libraries
+library(mosaic)
+library(DT)
+library(pander)
+library(tidyverse)
+
+df <- KidsFeet
+```
+
+<!-- Setup End -->
+
+
+
+
+
+
+
+
+
+
+<!-- ---------- -->
+<!-- QUESTIONS: -->
+<!-- ---------- -->
+
+Use the KidsFeet dataset from library(mosaic) to perform a regression of the length of a child's foot (Y) on the width of a child's foot (X).
+
+## 1.
+> _What is the estimated slope and intercept of the least squares regression line for this data?_
+
+[Response]
+
+```{r}
+# a.
+footlm <- lm(length ~ width, data=df)
+
+# b.
+pander(summary(footlm))
+
+# y_int <-  9.817
+# slope <- 1.658
+
+```
+
+<!-- Q1. End -->
+
+
+
+
+
+
+
+
+
+
+## 2.
+> _[Question]_
+
+[Response]
+
+```{r}
+# Scatterplot of liner regression
+plot(length ~ width, data=df)
+abline(footlm)
+```
+
+<!-- Q2. End -->
+
+
+
+<!-- Questions End -->
+
+
+
+<!-- -------- -->
+<!-- FILE END -->
+<!-- -------- -->

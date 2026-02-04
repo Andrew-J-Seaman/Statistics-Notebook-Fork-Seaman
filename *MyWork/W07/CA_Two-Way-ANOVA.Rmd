@@ -1,0 +1,45 @@
+---
+title: "Two-Way ANOVA"
+subtitle: "Class Activity"
+author: "Andrew Seaman"
+date: "2025-Aug-4"
+output: 
+  html_document:
+    theme: journal
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+<!-- ------ -->
+<!-- SETUP: -->
+<!-- ------ -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+# Load libraries
+library(mosaic)
+library(DT)
+library(pander)
+library(tidyverse)
+```
+
+<!-- Setup End -->
+
+
+
+
+
+<!-- ---------- -->
+<!-- QUESTIONS: -->
+<!-- ---------- -->
+
+See the [DayCare.Rmd]("../../Analyses/ANOVA/Examples/DarCare.Rmd") file for notes on this class activity.
+
+
+<!-- -------- -->
+<!-- FILE END -->
+<!-- -------- -->

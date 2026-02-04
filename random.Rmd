@@ -1,0 +1,32 @@
+---
+title: "Random Notes"
+author: "Andrew Seaman"
+---
+
+# Date: 1-21-26
+
+Let's import the libraries and data set.
+```{r setup1, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(pander)
+
+df <- read_csv("Data/Olympics.csv")
+```
+
+Let's get a count of years.
+```{r}
+df %>% 
+  group_by(Year) %>% 
+  summarize(count = n())
+```
+
+
+```{r}
+df %>% 
+  group_by(Year) %>% 
+  summarize(count = formatC(n(), format = "d", big.mark = ","))
+```
+
+
+
+

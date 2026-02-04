@@ -1,42 +1,224 @@
 ---
 title: "Food at College"
+subtitle: "MATH 325"
+author: "Andrew Seaman"
+date: 2025-Jun-27
 output: 
   html_document:
-    theme: cerulean
+    theme: journal
+    toc: true
+    toc_float: false #true
+    toc-level: 3
+    highlight: pygment
     code_folding: hide
 ---
 
+```{=html}
+<!--******************************************************
+LAST UPDATED: 2025-07-06
+BY: Andrew Seaman
+*******************************************************-->
+```
+
+<!-- Today's date -->
+
+```{r, warning=FALSE, echo=FALSE}
+# Utility: copy today's date to clipboard, only when editing
+if (interactive()) {
+  clipr::write_clip(Sys.Date()) # Date format: 'yyyy-mm-dd'
+}
+
+# Next, paste after 'LAST UPDATED' above
+```
+
+```{=html}
+<!--******************************************************
+Code Table of Contents (Code Toc)
+*******************************************************-->
+```
+
+<!-- Create: Code TOC -->
+
+```{r, warning=FALSE, echo=FALSE, message=FALSE}
+# ————————————————————————————————————————————————————————————————————————————
+#              Create the 'Code Table of Contents' (Code Toc)
+# ————————————————————————————————————————————————————————————————————————————
+# Libraries
+library(pander)
+
+# Lists (****MANUAL EDITING REQUIRED****)
+sections <- c("SETUP", "INSTRUCTIONS", "BACKGROUND", "EXPLORATION", "ANALYSIS")
+start_line <- c(92, 166, 594, 687, 875) # Rough start of section
+end_line <- c(155, 568, 576, 864, 1113)    # Rough end of section
+
+# Dataframe
+code_toc <- data.frame(
+  Section = sections,
+  Start = start_line,
+  End = end_line
+)
+
+# Markdown formatted dataframe
+formatted_code_toc <- pander(code_toc)
+
+# Copy markdown formatted dataframe (paste below)
+if (interactive()) {
+  clipr::write_clip(formatted_code_toc)
+}
+```
+
+```{=html}
+<!-- 
+Display: Code TOC
+Updated: 2025-07-06
+
+-----------------------------
+   Section      Start   End  
+-------------- ------- ------
+    SETUP        92     155  
+
+ INSTRUCTIONS    166    568  
+
+  BACKGROUND     594    576  
+
+ EXPLORATION     687    864  
+
+   ANALYSIS      875    1113 
+-----------------------------
+-->
+```
+
+```{=html}
+<!--
+.
+.
+.
+.
+.
+.
+-->
+```
+
+```{=html}
+<!-------------------------------------------------------
+.                          SETUP                    
+-------------------------------------------------------->
+```
+
+## Setup {.tabset .tabset-fade}
+
+### Hide
+
+*Click the tabs to read details and see the code.*
+
+----
+
+</BR>
+
+<!-- Libraries -->
+
+### Libraries
+
+These libraries provide the tools necessary for this analysis by way of data sourcing, manipulation, and visualization (see chunk).
+
 ```{r, warning=FALSE, message=FALSE}
-# From your file menu (at the top of R-Studio) select:
-# "Session -> Set working directory -> To source file location"
-# Then play this chunk to get the data into R.
 library(mosaic)
 library(car)
 library(DT)
 library(pander)
 library(readr)
-food <- read_csv("food.csv") #food.csv is in the Data folder...
+library(tidyverse) # Includes the 'tidyr' package
 ```
 
+<!-- Format HTML Output -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ----
 
-<!-- Instructions:
+</BR>
 
- Use the Food dataset and a Kruskal-Wallis Test(s) to answer an interesting question(s) that you come up with.
+### Data
+
+The data source is called __Food__ (see _Background_ for details).
+
+```{r, warning=FALSE, message=FALSE}
+# —————————————
+# INSTRUCTIONS:
+# —————————————
+
+# From your menu bar (at the top of R-Studio) select:
+#   1) "Session -> Set working directory -> To source file location"
+#   2) Then play this chunk to get the data into R.
+
+
+# Data import: source file variables for later construction
+file_name <- "food.csv"
+file_path <- "../../Data"
+
+# Data import: construct the full file path and import the data
+food <- read_csv(file.path(file_path, file_name)) 
+
+# Note: I used this creative method to import the data (but definitely not neccessary in this context. Kind of clear though).
+```
+
+----
+
+</BR>
+
+### Comments to Critiquers
+
+If you want to give your critiquers some ideas about what you have <u>questions</u> on and would like <u>help</u> with, place those details here.
+
+Notes:
+
+1.  I included a section called **"Exploration"** which shows how I navigated the data to determine my research question.
+2.  The plots at the end of my analysis are more there because I was curious and have less value towards the ultimate goal of this analysis than do the earlier plots.
+
+<!--End of comments -->
+
+----
+
+</BR>
+
+```{=html}
+<!--
+.
+.
+.
+.
+.
+.
+-->
+```
+
+```{=html}
+<!-------------------------------------------------------
+.                          INSTRUCTIONS                    
+-------------------------------------------------------->
+```
+
+```{=html}
+<!--
+## Instructions {.tabset .tabset-fade}
+
+### Hide
+
+_Click the tabs to view the instructions._
+
+### Show
+
+<span style="font-weight: bold; background-color: yellow;">Use the 'Food' dataset and a Kruskal-Wallis Test(s) to answer an interesting question(s) that you come up with.</span>
  
  About the dataset:
  
   * GPA - numerical, self-reported current college GPA
-
-  
   * weight - numerical, self-reported weight in lbs
-
-
   * gender - "Female", "Male"
-
-
   * breakfast - "Cereal", "Donut" 
+  
       The participants were shown a picture of "Cereal" and a "Donut" and asked which one of these pictures they associate with the word "breakfast."
 
 
@@ -49,7 +231,7 @@ food <- read_csv("food.csv") #food.csv is in the Data folder...
 
 
    * calories_day - Importance of consuming calories per day
-     1 - i dont know how many calories i should consume 
+     1 - i dont know how many calories i should consume
      2 - it is not at all important 
      3 - it is moderately important 
      4 - it is very important
@@ -95,7 +277,7 @@ food <- read_csv("food.csv") #food.csv is in the Data folder...
     * diet_current - describe your current diet
      open ended
 
-	
+    
     * diet_current_coded
      1 - healthy/balanced/moderated/
      2 - unhealthy/cheap/too much/random/
@@ -247,7 +429,7 @@ food <- read_csv("food.csv") #food.csv is in the Data folder...
       
     * Ideal_diet_coded
       1 – portion control
-      2 – adding veggies/eating healthier food/adding fruit	
+      2 – adding veggies/eating healthier food/adding fruit 
       3 – balance
       4 – less sugar
       5 – home cooked/organic
@@ -410,35 +592,765 @@ food <- read_csv("food.csv") #food.csv is in the Data folder...
       3 - 900 
       4 - 1315
 
-
 Note this dataset and description come from: © 2020 Kaggle Inc for further details visit:
 
 [Food choices on Kaggle](https://www.kaggle.com/borapajo/food-choices?select=food_coded.csv)
 
+Food choices and preferences of college students
+This dataset includes information on food choices, nutrition, preferences, childhood favorites, and other information from college students. There are 126 responses from students. Data is raw and uncleaned. Cleaning is in the process and as soon as that is done, additional versions of the data will be posted.
 
-If you want to give your critiquers some ideas about what you have questions on and would like help with, place those details here.-->
+</BR>
 
+-->
+```
 
+```{=html}
+<!--
+.
+.
+.
+.
+.
+.
+-->
+```
 
+```{=html}
+<!--*****************************************************
+.                          BEGIN ANALYSIS                    
+******************************************************-->
+```
 
-<!--End your comments to your critiquers before this line.-->
+```{=html}
+<!--
+.
+.
+.
+.
+.
+.
+-->
+```
+
+```{=html}
+<!-------------------------------------------------------
+.                          BACKGROUND                    
+-------------------------------------------------------->
+```
+
+## Background {.tabset .tabset-fade}
+
+<!-- NOTE: 
+I don't think I need to have a 'Hide' option in this tabset. I want the background to be shown by default. -->
+
+<!-- ### Hide -->
+
+<!-- *Click the tab to view details and read code.* -->
+
+### Description
+
+#### Food choices and preferences of college students
+
+<!-- From the website linked below -->
+
+This dataset includes information on food choices, nutrition, preferences, childhood favorites, and other information from college students. There are 126 responses from students. Data is raw and uncleaned. Cleaning is in the process and as soon as that is done, additional versions of the data will be posted.
+
+<!-- Note on the data -->
+
+Note this dataset and description come from: © 2020 Kaggle Inc
+
+For further details visit: [Food choices on Kaggle](https://www.kaggle.com/borapajo/food-choices?select=food_coded.csv)
 
 ----
 
-<!--Begin writing your Analysis after this point.-->
+</BR>
 
-## Background
+### Data Summary {.tabset .tabset-fade}
+
+The **Food** dataset has over 50 columns of data. Click through the tabs below to see summarizations and detail. (Code source: ChatGPT)
+
+#### Hide
+
+*Click the buttons to view the summaries.*
+
+----
+
+</BR>
+
+#### 1. Structure
+
+```{r}
+str(food)
+```
+
+----
+
+</BR>
+
+#### 2. Head
+
+```{r}
+head(food)
+```
+
+----
+
+</BR>
+
+#### 3. Summary (numericals)
+
+```{r}
+summary(food)
+```
+
+----
+
+</BR>
+
+#### 4. Summary (Categoricals)
+
+<!-- Levels & Counts -->
+
+```{r}
+# Instantiate empty list for variables with factor levels
+factor_vars <- c()
+
+# Find columns
+for (colname in names(food)) {
+  column <- food[[colname]] # grab the column itself
+  
+  if (is.factor(column)) {
+    # store column names
+    factor_vars <- c(factor_vars, colname)
+  }
+}
+
+# Show table for each variable
+for (colname in factor_vars) {
+  table(food$colname)
+}
+```
+
+----
+
+</BR>
+
+#### 5. Count NA
+
+```{r}
+colSums(is.na(food))
+```
+
+----
+
+</BR>
+
+#### 6. All Vars
+
+```{r}
+names(food)
+```
+
+----
+
+</BR>
+
+#### 7. Count row/col
+
+```{r}
+nrow(food)
+ncol(food)
+```
+
+----
+
+</BR>
+
+```{=html}
+<!--
+.
+.
+.
+.
+.
+.
+-->
+```
+
+```{=html}
+<!-------------------------------------------------------
+.                          EXPLORATION                    
+-------------------------------------------------------->
+```
+
+## Exploration {.tabset .tabset-fade}
+
+### Hide
+
+*Click the tabs to view details and read code.*
+
+----
+
+</BR>
+
+<!-- This secondary tabset is used for the tables below and to contain the code chunks that have no output. -->
+
+### Variable Categorization {.tabset .tabset-pills .tabset-fade}
+
+The following variables are up for consideration in this analysis which aims to __assess__ the presence of __variation__ among nonparametric groups.
+
+First, we algorithmicaly categorize all of the variables from the dataset.
+
+```{r}
+# Sort variables by type
+numerical_vars <- c()
+categorical_vars <- c()
+openEnded_vars <- c()
+
+for (colname in names(food)) {
+  column <- food[[colname]] # grab the column itself
+  
+  if (is.numeric(column)) {
+    # store numeric columns
+    numerical_vars <- c(numerical_vars, colname)
+  
+  } else if (is.factor(column)) {
+    nlev <- nlevels(column)
+    
+    if(nlev <= 12) { # a bit higher than for char columns
+      # store categorical columns
+      categorical_vars <- c(categorical_vars, colname)
+    } else {
+        # store open response columns
+        openEnded_vars <- c(openEnded_vars, colname)
+    }
+  
+  } else if (is.character(column)) {
+    # heuristic: check number of unique entries
+    nunique <- length(unique(column))
+    
+    if (nunique <= 8) { #slightly lower threshold
+      categorical_vars <- c(categorical_vars, colname)
+    } else {
+        openEnded_vars <- c(openEnded_vars, colname)
+    }
+  }
+}
+```
+
+<!-- Utility 1 -->
+
+<!-- Util. 1 (1): View sorted dataframe -->
+
+```{r, echo=FALSE}
+# Create a flat list of of column order by variable category class
+combined_vars = c(numerical_vars, categorical_vars, openEnded_vars)
+flat_combined_vars <- unlist(combined_vars)
+
+# Sort 'food' dataframe variables by categorization class and view it.
+food_sorted <- food[, flat_combined_vars]
+View(food_sorted)
+```
+
+<!-- Utility 2 -->
+
+<!-- Util. 2 (1): View subset dataframe for categorized variables-->
+
+```{r, echo=FALSE}
+# Subset the 'food' dataframe for numerical variables
+numerical <- food[, numerical_vars]
+View(numerical)
+```
+
+<!-- Util. 2 (2): View subset dataframe for categorized variables-->
+
+```{r, echo=FALSE}
+# Subset the 'food' dataframe for categorical variables
+categorical <- food[, categorical_vars]
+View(categorical)
+```
+
+<!-- Util. 2 (3): View subset dataframe for categorized variables -->
+
+```{r, echo=FALSE}
+# Subset the 'food' dataframe for open ended variables
+openEnded <- food[, openEnded_vars]
+View(openEnded)
+```
+
+Next, we create two distinct dataframes for deeper insights into the data and to generate questions worth analysing.
+
+```{r Expl. - Create Dataframes}
+# Variables (categorized) as lists
+x_vars <- numerical_vars
+g_vars <- categorical_vars
+o_vars <- openEnded_vars
+
+# List lengths
+x_len <- length(x_vars)
+g_len <- length(g_vars)
+o_len <- length(o_vars)
+
+# Longest list as value
+max_len <- max(x_len, g_len, o_len) 
+
+# Pad shorter two lists to match the longest list
+x_vars_padded <- c(x_vars, rep("", max_len - x_len))
+g_vars_padded <- c(g_vars, rep("", max_len - g_len))
+o_vars_padded <- c(o_vars, rep("", max_len - o_len))
+
+# Make a dataframe of the categorized variables (x, g, o)
+AllVars_xgo <- data.frame(
+  'x (numerical)' = x_vars_padded,
+  'g (categorical)' = g_vars_padded,
+  'o (open ended)' = o_vars_padded 
+)
 
 
 
 
+# All possible combinations of variables (x, g)
+AllCombos_xg <- expand.grid(
+  x = x_vars, 
+  g = g_vars, 
+  stringsAsFactors = FALSE
+) %>% 
+  rename(
+    `x (numerical)` = x,
+    `g (categorical)` = g
+  )
+```
+
+Note, this function helps reduce code duplication.
+
+<!-- Function: construct and show datatable -->
+```{r}
+construct_and_show_datatable <- function(df) {
+  # Mix hardcoded with calculated values for datatable > options > lengthMenu
+  all <- as.numeric(nrow(df))
+  options <- c(5, 30, all)
+  
+  # Display table
+  datatable(
+    df,
+    options = list(
+      lengthMenu = options,
+      scrollX = TRUE,
+      fixedColums = TRUE,
+      columnDefs = list(
+        list(className = 'dt-left', targets = 0)
+      )
+    )
+  )
+}
+```
+
+#### Hide
+
+*Click the buttons to view either table.*
+
+----
+
+</BR>
+
+#### Categories
+
+**Categories** include *x*, *g*, and *o* (numerical/categorical/open ended).
+
+```{r}
+construct_and_show_datatable(AllVars_xgo)
+```
+
+----
+
+</BR>
+
+#### Combinations
+
+Variable **combinations** are pairings of only *x* and *g* (numerical/categorical) variables ordered by the *g* (categorical) variable.
+
+```{r}
+construct_and_show_datatable(AllCombos_xg)
+```
+
+----
+
+</BR>
+
+```{=html}
+<!--
+.
+.
+.
+.
+.
+.
+-->
+```
+
+```{=html}
+<!-------------------------------------------------------
+.                          ANALYSIS                    
+-------------------------------------------------------->
+```
+
+## Analysis
+
+> **Question:** Does ones' perception of their weight impact their GPA? </BR> **Hypotheses:** We will rely on the standard hypotheses for a Kruskal-Wallis Rank Sum test. </BR> $$
+> H_0: \text{All samples are from the same distribution.}
+> \\
+> H_a: \text{At least one sample's distribution is stochastically different.}
+> $$ **Conclusion:** One's perception of their weight does not significantly bear on the resulting GPA.
+
+First, the data are cleaned for plotting and testing. In this case, proper levels are defined for values that have no inherent order such as is the case for the ranking levels found in the `self_perception_weight` variable.
+
+<!-- Clean data for plotting and testing -->
+
+```{r Anly_1 - Clean, warning=FALSE}
+food1 <- food %>%
+  # convert GPA to numeric and store in a temp column
+  mutate(GPA_num = as.numeric(as.character(GPA))) %>%
+  # filter to only rows with valid GPA
+  filter(!is.na(GPA_num)) %>%
+  # filter on self-perception
+  filter(self_perception_weight %in% 1:6) %>%
+  # convert GPA to numeric
+  mutate(GPA = GPA_num) %>% 
+  # drop levels
+  droplevels() %>%
+  # convert to a factor with six levels
+  mutate(self_perception_weight = factor(self_perception_weight, levels = 1:6)) %>% 
+  # remove the temp column and select the needed columns
+  select(GPA, self_perception_weight, -GPA_num)
+```
+
+<!-- Utility 1 -->
+
+<!-- Util. 1 (1) -->
+
+```{r, echo=FALSE, include=FALSE}
+View(food1)
+```
+
+<!-- Utility 2 -->
+
+<!-- Util. 2 (1) -->
+
+```{r, echo=FALSE, include=FALSE}
+str(food1)
+```
+
+### Plots {.tabset .tabset-pills .tabset-fade}
+
+Second, two selected variables—`Self Perception of Weight` (6 levels) and `GPA`— are plotted side-by-side to visually reveal if any stochastic variance stands out.
+
+<u>Legend: **Self Perception of Weight**</u>
+
+-   6 - I dont think myself in these terms
+-   5 - Overweight
+-   4 - Slightly overweight
+-   3 - Just right
+-   2 - Very fit
+-   1 - Slim
+
+#### Boxplot
+
+This plot shows min, Q1, median, Q3, and max for each factor level.
+
+Ovservably, no one factor level stands out as having significant stochastic variance from the other factor levels.
+
+<!-- Boxplot of variables -->
+
+```{r}
+# Does one's self-perception of their weight impact their GPA?
+food1 %>% 
+boxplot(
+  GPA ~ self_perception_weight, 
+  data = ., 
+  xlab = "Self Perception of Weight", 
+  main = "Regardless of Self Perception of Weight GPA Varies Little"
+)
+```
+
+#### Dotplot
+
+This plot allows for a clearer presentation of data congregation, or where data is heavily grouped for each factor level.
+
+```{r}
+# Does one's self-perception of their weight impact their GPA?
+dotplot(
+  GPA ~ self_perception_weight, 
+  data = food1, 
+  xlab = "Self Perception of Weight", 
+  main = "Regardless of Self Perception of Weight GPA Varies Little",
+  na.rm = TRUE
+)
+```
+
+</BR>
+
+### Statistical Test
+
+Next, perform a **Kruskal-Wallis Rank Sum** test to assess statistical significance and display the results. Per usual, let α = 0.05 for a 95% confidence level.
+
+<!-- Raw output: -->
+
+<!-- Kruskal-Wallis Rank Sum Test -->
+
+```{r}
+# Test the realtionship between GPA and self_perception_weight
+test_result <-food1 %>% 
+  kruskal.test(GPA ~ self_perception_weight, data = .)
+
+# test_result # Raw output
+```
+
+<!-- Neat output: -->
+
+<!-- Display the results -->
+
+```{r}
+pander(test_result) # Neat output
+```
+
+It is shown in these results that the **correlation between the selected variables is low** (p-values: 0.6216). Otherwise, the resulting `GPA` values would be shown to come from significantly different distributions identifiably separate one from another by one's `Self Perception of Weight`. However, from this test it is clear this is not likely to be the case, or in other words one's self-perception of their own weight has little impact on their GPA.
+
+### Numerical Summary
+
+Lastly, a numerical summary of GPA for each of the factor levels will further confirm the similarlity in GPA scores even when sorted by factor level (`self_perception_weight`).
+
+```{r}
+food2 <- food1 %>% 
+  rename(SPW = self_perception_weight)
+
+fvs <- food2 %>% 
+  favstats(GPA ~ SPW, data = .) #%>%
+  # select(SPW, median) %>%
+  
+
+pander(fvs)
+```
+
+Interestingly, when we <u>revise the above boxplots</u> showing key values traced across the factor levels (SPW) with lines it becomes more clear how the outliers of each level skew the mean but not the median compared to other factor levels further confirming our choice of statistical test which uses the median instead of the mean to be the more appropriate option.
+
+<!-- Revised Boxplot (with lines) -->
+```{r}
+ggplot() +
+  # boxplots
+  geom_boxplot(
+    data = food2,
+    aes(x = SPW, y = GPA),
+    fill = "lightgray",
+    color = "black"
+  ) +
+  # summary lines
+  geom_line(
+    data = fvs,
+    aes(x = SPW, y = min, group = 1, color = "Min"),
+    alpha = .8, linetype = "dotted"
+  ) +
+  geom_line(
+    data = fvs,
+    aes(x = SPW, y = max, group = 1, color = "Max"),
+    alpha = .8, linetype = "dotted"
+  ) +
+  geom_line(
+    data = fvs,
+    aes(x = SPW, y = median, group = 1, color = "Median")
+  ) +
+  geom_line(
+    data = fvs,
+    aes(x = SPW, y = mean, group = 1, color = "Mean")
+  ) +
+  scale_x_discrete(
+    labels = levels(food2$SPW)
+  ) +
+  labs(
+    title = "Summary GPA across SPW levels with Boxplots",
+    x = "Self Perception Weight",
+    y = "GPA",
+    color = "Statistic"
+  ) +
+  theme_classic()
+```
+
+We could even look at the entire numerical summary as a <u>dotplot</u> with only the **median** and **mean** plotted with lines of course showing the same trend as above: when outliers pull on the shape of the distribution the mean follows whereas the median does so far less making it the better anchor for estimates reliant on a measure of the tendency towards centrality.
+
+<!-- Dotplot (with lines) -->
+```{r}
+# This is what the `tidyr` library was imported for.
+
+# Elongate the data
+fvs_long <- fvs %>%
+  pivot_longer(cols = c(min, Q1, median, Q3, max, mean, sd),
+               names_to = "Statistic",
+               values_to = "Value")
+# Define the negative offset for use in straightening labels and whatnot.
+neg_offset <- -.2
+
+# Primary plot
+ggplot(fvs_long, aes(x = as.numeric(SPW) + neg_offset, y = Value, color = Statistic)) +
+  # Dotplot: jittered value distribution
+  geom_dotplot(data = food2, aes(x = SPW, y = GPA), 
+               binaxis = "y", stackdir = "up", fill = "gray90", color = "gray90", binwidth = 0.05, alpha = 0.3
+  ) +
+  # Dotplot: summary stats
+  geom_point(size = 2, position = position_dodge(width = 0.0), shape = 1) +
+  # Line charts: summary stats
+  geom_line(data = fvs, aes(x = as.numeric(SPW) + neg_offset, y = median, color = "median")) + # Line to track the median
+  geom_line(data = fvs, aes(x = as.numeric(SPW) + neg_offset, y = mean, color = "mean")) + # Line to track the mean
+  # Data labels: select summary stats
+  geom_label( # label: median
+    data = fvs,
+    aes(x = as.numeric(SPW) - .5, y = median + .2, label = round(median, digits=2), color = "median"),
+    size = 2.2,
+    fill = "gray100",
+    show.legend = FALSE
+  ) +
+  geom_label( # label: mean
+    data = fvs,
+    aes(x = as.numeric(SPW) - .5, y = mean - .2, label = round(mean, digits=2), color = "mean"),
+    size = 2.2,
+    fill = "gray100",
+    show.legend = FALSE
+  ) +
+  # Vertical line: Separate the factor levels
+  geom_vline(xintercept = seq(1, 6, by = 1) + 0.4, color = "gray80", linetype = "dashed") +
+  labs(
+    title = "Summary Statistics of GPA by Self-Perception of Weight",
+    x = "Self Perception of Weight",
+    y = "GPA"
+  ) +
+  theme_classic()
+```
+
+</BR>
+
+### Conclusion
 
 
+<!-- ************************************************
+NOTE: THE CONCLUSION GOT VERY BLOATED. SO I REDID IT.
+************************************************ -->
+
+<!-- 
+——————————————————————————
+CONCLUSION V.1 (bloated)
+——————————————————————————
+-->
+
+<!-- Comment out V1 -->
+
+<!-- NOTE: 
+In order to comment out this section which is a combination of R code chunks and markdown I commented out each line (even if it was a comment already) using html comments then wrapped the block in an R code chunk and again commented out the block with R style comments. This works because it does and I don't want to explain myself. I did what I needed to do haha. -->
+
+```{r, echo=FALSE, include=FALSE, warning=FALSE, message=FALSE}
+# <!-- <!-- Differences (median - mean) --> -->
+# <!-- ```{r} -->
+# <!-- # Find the differences between the median and mean for each factor level -->
+# <!-- fvs2 <- fvs %>% -->
+# <!--   mutate( -->
+# <!--     diff = round(median - mean, digits=3) # I renamed this variable below. I want to call it diff here for simplicity sake. -->
+# <!--   ) -->
+# 
+# <!-- # Construct a pivoted table of the differences -->
+# <!-- fvs2_wide <- fvs2 %>% -->
+# <!--   select(SPW, 'median - mean' = diff) %>% -->
+# <!--   mutate(Calculation = 'median - mean') %>% -->
+# <!--   pivot_wider( -->
+# <!--     names_from = SPW, -->
+# <!--     values_from = 'median - mean') %>% -->
+# <!--   relocate(Calculation, .before = everything()) -->
+# 
+# 
+# <!-- # Calculate the average difference -->
+# <!-- avg_diff <- round(mean(fvs2$diff), digits = 2) -->
+# <!-- ``` -->
+# 
+# <!-- As previously stated both at the beginning and throughout, the two selected variables—`self_perception_weight` (also called `SPW`) and `GPA`—have little to do with each other. Therefore, a change in one will likely correspond with very insignificant change in the other. -->
+# 
+# <!-- Below we can see for each factor level the <u>calculated difference between the median and mean</u> which clearly demonstrates the overall trend that the `median` is __higher__ than the `mean` in this case, or less impacted by outliers dragging the data and potentially left skewing the distribution. -->
+# 
+# <!-- ```{r} -->
+# <!-- # Display long, subsetted table -->
+# <!-- pander(fvs2_wide) -->
+# <!-- ``` -->
+# 
+# <!-- Also, the average difference (`median - mean`) is `r avg_diff`. -->
+# 
+# <!-- ```{r} -->
+# <!-- # Calculate the difference -->
+# <!-- mean_of_means <- mean(fvs$mean) # Mean of means -->
+# <!-- mean_of_means_rounded <- round(mean(fvs$mean), digits=2) # Mean of means rounded -->
+# <!-- mean_lvl5 <- fvs$mean[fvs$SPW == 5] # Mean (factor lvl 5) -->
+# <!-- mean_lvl5_rounded <- round(fvs$mean[fvs$SPW == 5], digits = 2) # Mean (factor lvl 5) -->
+# 
+# <!-- diff_lvl5 <- mean_of_means - mean_lvl5 -->
+# <!-- diff_lvl5_rounded <- round(mean_of_means - mean_lvl5, digits=2) # Difference -->
+# 
+# <!-- red <- "firebrick" -->
+# 
+# <!-- # --- -->
+# 
+# <!-- mean_lvl6 <- fvs$mean[fvs$SPW == 6] # Mean (factor lvl 6) -->
+# <!-- mean_lvl6_rounded <- round(fvs$mean[fvs$SPW == 6], digits = 2) # Mean (factor lvl 6) -->
+# 
+# <!-- diff_lvl6 <- mean_of_means - mean_lvl6 -->
+# <!-- diff_lvl6_rounded <- round(mean_of_means - mean_lvl6, digits=2) -->
+# 
+# <!-- if (diff_lvl6 >= 0){ -->
+# <!--   above_or_below <- "above" -->
+# <!--   txt_color <- "forestgreen" -->
+# <!-- } else { -->
+# <!--   above_or_below <- "below" -->
+# <!--   txt_color <- "firebrick" -->
+# <!--   } -->
+# <!-- ``` -->
+# 
+# <!-- <!-- Summary of paragraph: include numerical references to mean values and compare/contrast --> -->
+# <!-- The lowest `mean` value is for factor __level 5__ (Overweight) at __`r mean_lvl5_rounded`__ (rounded) which is -->
+# <!-- <!-- Apply styling --> -->
+# <!-- <span style ="font-weight: bold; color: `r red`;"> lower</span> -->
+# <!-- than the mean of means (`r mean_of_means_rounded`) by __`r diff_lvl5_rounded`__. This is especially usefully for why this data is hard to analyze when the `mean` is all over the place. Notably, immediately after dropping so low the `mean` shoots back up to __`r mean_lvl6_rounded`__ (rounded) for factor __level 6__ which is __`r diff_lvl6_rounded`__ -->
+# <!-- <!-- Apply styling --> -->
+# <!-- <span style ="font-weight: bold; color: `r txt_color`;">`r above_or_below`</span> -->
+# <!-- the mean of means. -->
+# 
+# <!-- Further research could consider different pairings of variables and perhaps use the results of this analysis to determine which variables a more logically connected and potentially impactful on one another. -->
+```
 
 
+<!-- 
+——————————————————————————
+CONCLUSION V.2 (debloated)
+—————————————————————————— 
+-->
 
+As discussed throughout this analysis, there appears to be __little meaningful relationship__ between a person's self-perception of their weight (`self_perception_weight`, or `SPW`) and their GPA (`GPA`). This is confirmed when examining the __median GPA values__ across SPW levels, which remain relatively stable.
 
+```{r}
+# Max & Min 'median' (SPW levels: all)
+medians <- fvs$median
+min_median <- min(medians) # Lvl 6
+max_median <- max(medians) # Lvl 1, 2, 4
 
+# Median of medians (SPW levels: all)
+median_of_medians <- median(medians)
 
+# Calculate difference
+diff_min <- median_of_medians - min_median
+diff_max <- median_of_medians - max_median
 
+```
 
+For example, the median GPAs for all levels range narrowly from `r min_median` to `r max_median`. Even the __lowest median__, found at SPW level 6 (I don't think myself in these terms), is __`r min_median`__, only __`r diff_min` points below__ the overall median of medians (`r median_of_medians`). The highest median, which is the same for SPW levels 1 (Slim), 2 (Very fit), and 4 (Slightly overweight), is __`r max_median`__, only __`r diff_max` points above__ the overall median of medians.
+
+This minimal fluctuation suggests that __self-perceived weight (SPW) does not significantly influence academic performance (GPA)__ in this dataset.
+
+Further analysis could explore other variable pairings that may be more strongly correlated, or dive deeper into subgroups to assess if specific intersections (e.g., `gender` + `SPW`) reveal more nuance.
+
+</BR>
+
+<!-- Add two new lines at the end of the analysis for better output display and user experience. -->
+
+</BR></BR>

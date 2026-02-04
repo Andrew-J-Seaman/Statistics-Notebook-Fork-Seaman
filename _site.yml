@@ -4,40 +4,16 @@ navbar:
   left:
     - text: "R Help"
       menu:
+        - text: "R Cheatsheets & Notes"
+          href: RCheatSheetsAndNotes.html
         - text: "R Commands"
           href: RCommands.html
         - text: "R Markdown Hints"
           href: RMarkdownHints.html
-        - text: "R Cheatsheets & Notes"
-          href: RCheatSheetsAndNotes.html
         - text: "Data Sources"
           href: DataSources.html
-    - text: "Describing Data"
-      menu:
-        - text: "Graphical Summaries"
-          href: GraphicalSummaries.html
-        - text: "Numerical Summaries"
-          href: NumericalSummaries.html
-    - text: "Making Inference"
-      menu:
-        - text: "Making Inference"
-          href: MakingInference.html
-        - text: "t Tests"
-          href: tTests.html
-        - text: "Wilcoxon Tests"
-          href: WilcoxonTests.html
-        - text: "Kruskal-Wallis Test"
-          href: Kruskal.html
-        - text: "ANOVA"
-          href: ANOVA.html
-        - text: "Linear Regression"
-          href: LinearRegression.html
-        - text: "Logistic Regression"
-          href: LogisticRegression.html
-        - text: "Chi Squared Tests"
-          href: ChiSquaredTests.html
-        - text: "Randomization"
-          href: PermutationTests.html
+        - text: "External Links"
+          href: External-Links.html
     - text: "Analyses"
       menu:
         - text: "Good Example Analysis"
@@ -64,7 +40,32 @@ navbar:
           href: ./Analyses/Logistic Regression/MyLogisticRegression.html
         - text: "My Chi-sqaured Test"
           href: ./Analyses/Chi Squared Tests/MyChiSquaredTest.html
-
+    - text: "Describing Data"
+      menu:
+        - text: "Graphical Summaries"
+          href: GraphicalSummaries.html
+        - text: "Numerical Summaries"
+          href: NumericalSummaries.html
+    - text: "Making Inference"
+      menu:
+        - text: "Making Inference"
+          href: MakingInference.html
+        - text: "t Tests"
+          href: tTests.html
+        - text: "Wilcoxon Tests"
+          href: WilcoxonTests.html
+        - text: "Kruskal-Wallis Test"
+          href: Kruskal.html
+        - text: "ANOVA"
+          href: ANOVA.html
+        - text: "Linear Regression"
+          href: LinearRegression.html
+        - text: "Logistic Regression"
+          href: LogisticRegression.html
+        - text: "Chi Squared Tests"
+          href: ChiSquaredTests.html
+        - text: "Randomization"
+          href: PermutationTests.html
 
           
 output_dir: '.'

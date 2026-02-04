@@ -13,6 +13,7 @@ library(DT)
 library(pander)
 library(car)
 library(tidyverse)
+library(lattice)
 
 # To get the "late" dataset into your R Console, 
 # you need to go to your file menu of R-Studio and select
@@ -73,9 +74,36 @@ the penalty that was introduced. A fine of NIS 10 is relatively small but not in
 
 </div>
 
+</BR>
+
+**Make note of the following:**
+
+*How many Day Care Centers were included in the study?*
+
+* 10 (type: private)
+
+*How many Centers were included in the treatment group? The Control Group?*
+
+* Treatment Group: 6
+* Control Group: 4
+
+*During which weeks did the researchers simply observe the Day Care Centers?*
+
+* Weeks: 1-4
+
+*During which weeks was the fine applied to the treatment group?*
+
+* Weeks: 5-16
+
+*During which weeks was the fine removed from the treatment group?*
+
+* Weeks: 17-20
+
+*What was the main response variable of interest that the researchers recorded each week on the Day Care Centers?*
+
+* Parents showing up late to pick up their children.
 
 ### The Data (Wide)
-
 
 The `late` Day Care Center data is shown here in the "wide data format" that was provided by the authors of the original research article. But this format is not terribly useful for an ANOVA analysis.
 
@@ -87,12 +115,41 @@ pander(late, split.tables = Inf)
 
 ### The Data (Long)
 
-The `Late` Day Care Center data is shown here in the "long data format", a more useable format for analysis.
+The `Late` Day Care Center data is shown here in the "long data format", a more usable format for analysis.
 
 ```{r}
 pander(Late)
 ```
 
+
+### Add Factor
+
+**Instructions:**
+
+Use the Late data set to add a new column to the data set that translates Weeks (a numeric column) into a column that is a factor called "Period". This factor Period should have three levels: "Before the Fine", "Fine Applied", and "Fine Removed".
+
+Hint: Look up the mutate( ) function on the R Commands page of the Statistics-Notebook and study the second Example Code that creates a new column called "season" from the numeric "birthmonth" column in the KidsFeet dataset.
+
+```{r}
+# Add new column. Translate 'Week' into a factor.
+Late <- Late %>% 
+  mutate(
+    Period = factor(
+      case_when(
+        Week >= 1 & Week <= 4   ~ "Before the Fine",
+        Week >= 5 & Week <= 16  ~ "Fine Applied",
+        Week >= 17 & Week <= 20 ~ "Fine Removed"
+      ),
+      levels = c("Before the Fine", "Fine Applied", "Fine Removed")
+    )
+  )
+```
+
+**Test:**
+
+```{r}
+table(Late$Period) %>% pander()
+```
 
  
 ##  
@@ -108,32 +165,190 @@ pander(Late)
 
 <!-- State the hypotheses for this analysis in this section. -->
 
+#### Set 1:
+
+Hypotheses about Treatment where $\mu$ represents the mean number of late children picked up from Day Care Centers during the week.
+
+$$
+H_0: \mu_\text{Control Group} = \mu_\text{Fine Group}
+\\
+H_a: \text{The average number of late children differs for one Group}
+$$
+
+#### Set 2:
+
+Hypotheses about Period where $\mu$ represents the mean number of late children picked up from Day Care Centers during the week.
+
+$$
+H_0: \mu_\text{Before the Fine} = \mu_\text{Fine Applied} = \mu_\text{Fine Removed}
+\\
+H_a: \text{The average number of late children differs for at least one Period}
+$$
+
+#### Set 3:
+
+Hypotheses about the interaction of Treatment and Period.
+
+$$
+H_0: \text{The effect of the Group on the average number of late children picked up does not depend on the Period of the study.}
+\\
+H_a: \text{The effect of the Group on the average number of late children picked up changes during at least one Period of the study.}
+$$
+
 
 
 ### Two-way ANOVA 
 
 <!-- Show the two-way ANOVA summary output in this section. -->
 
+```{r}
+# Two-Way ANOVA: 
+
+  # Notation: myaov <- aov(Y ~ X1+X2+X1:X2, data=YourDataSet)
+
+myaov <- aov(NumberofLateChildren ~ Treatment + Period + Treatment:Period, data = Late)
+
+results <- summary(myaov)
+```
+**Raw Output:**
+```{r}
+results
+```
+
+**Clean Output:**
+```{r}
+pander(results)
+```
 
 
+*Which p-values were significant?*
 
-### Graphics & Numerical Summaries
+* All of them (Treatment, Period, Treatment:Period)
+
+
+### Graphics & Numerical Summaries {.tabset .tabset-fade}
 
 <!-- Show the three graphics of the two-way ANOVA in this section and provide a supporting table of numerical summaries for each graphic. -->
 
+#### Graphic 1
 
+```{r}
+# Graphic 1: First, create an xyplot(...) of the Treatment factor. Creating a supporting table of means for this plot.
 
+  # Notation: plot(y ~ x, data=NameOfYourData)
+    # y is the quantitative response variable, i.e., “numeric vector.”
+    # x is the quantitative explanatory variable, i.e., “numeric vector.”
+    # NameOfYourData is the name of the dataset containing y and x.
 
+xyplot(NumberofLateChildren ~ as.factor(Treatment),
+       data = Late,
+       type = c("p", "a"),  # points and averages
+       main = "Late Children by Treatment",
+       xlab = "Treatment Group",
+       ylab = "Number of Late Children")
+```
+
+```{r}
+# Numerical Summary 1: 
+numSummary1 <- Late %>% 
+  group_by(Treatment) %>% 
+  summarise('Mean Late Children' = mean(NumberofLateChildren, na.rm = TRUE)) %>% 
+  ungroup()
+
+pander(numSummary1)
+```
+
+#### Graphic 2
+
+```{r}
+# Graphic 2: Second, create an xyplot(...) of the Period factor and include a supporting numerical summary table of means.
+
+xyplot(NumberofLateChildren ~ as.factor(Period),
+       data = Late,
+       type = c("p", "a"),  # points and averages
+       main = "Late Children by Period",
+       xlab = "Period",
+       ylab = "Number of Late Children")
+```
+
+```{r}
+# Numerical Summary 2: 
+
+numSummary2 <- Late %>% 
+  group_by(Period) %>% 
+  summarise('Mean Late Children' = mean(NumberofLateChildren, na.rm = TRUE)) %>% 
+  ungroup()
+
+pander(numSummary2)
+
+```
+
+#### Graphic 3
+
+```{r}
+# Graphic 3: Third, and most importantly, create an xyplot(...) that shows the interaction of the Treatment and Period variables. It is best practice to place the factor with the most levels as the x-axis of the graph (Period in this case) and the factor with the fewest variables as the legend (Treatment in this case). Then, create a table of numerical summaries showing the means for all six conditions presented in the plot.
+
+xyplot(NumberofLateChildren ~ Period,
+       data = Late,
+       group = Treatment,   # sets legend groups
+       type = c("p", "a"),  # points and averages
+       auto.key = TRUE,     # automatically generates legend
+       main = "Late Children by Treatment and Period",
+       xlab = "Period",
+       ylab = "Number of Late Children")
+```
+
+```{r}
+# Numerical Summary 3: 
+
+numSummary3 <- Late %>% 
+  group_by(Treatment, Period) %>% 
+  summarise(
+    `Mean Late Children` = round(mean(NumberofLateChildren, na.rm = TRUE), 2),
+    .groups = "drop"
+  )
+
+pander(numSummary3)
+```
+
+###
 
 ### Conclusions
 
 <!-- Interpret the results of the study. Use specific details in your writing like mentioning the actual amount of the fine and the relative cost to babysitting. Mention the average number of late children before the fine, during the fine, and after the fine was removed. -->
+
+The two-way ANOVA results show statistically significant effects for Treatment (p < 0.001), Period (p < 0.001), and the Treatment × Period interaction (p < 0.001). This means:
+	1.	The number of late pickups differed significantly between the Control and Fine groups overall.
+	2.	The number of late pickups also differed significantly between the three Periods (Before the Fine, Fine Applied, Fine Removed).
+	3.	Most importantly, the effect of Treatment depended on the Period — the difference between Control and Fine groups changed over time.
+
+From the numerical summaries:
+	•	Before the fine was applied, both groups had similar late pickups (Control ≈ 10, Fine ≈ 8).
+	•	Once the fine of NIS 10 (~$2.72 USD) per child for delays ≥10 minutes was introduced, late pickups increased sharply in the Fine group to ≈ 16.4, while the Control group stayed roughly the same (≈ 9.2).
+	•	After the fine was removed, the Fine group’s late pickups rose further to ≈ 18.7, while the Control group dropped slightly to ≈ 8.3.
+
+The interaction plot reinforces this pattern: the Fine group’s trend line rises steeply after the fine is introduced, while the Control group’s line stays flat or slightly decreases.
+
+These results suggest that instead of deterring late pickups, the fine may have normalized or even incentivized lateness in the Fine group, possibly because parents reframed lateness as a service they could “purchase” cheaply — especially compared to babysitting costs (NIS 15–20/hour, ≈$4.08–$5.44 USD). The removal of the fine did not reverse this effect; lateness remained higher than before the fine was introduced.
+
+The fine not only **failed** to reduce late pickups, but it significantly increased them, and this effect persisted after its removal.
+
 
 
 
 ### Diagnostic Plots
 
 <!-- Provide some discussion about how appropriate the ANOVA analysis was for this data. Include the residuals vs. fitted values plot and the Q-Q Plot of residuals. -->
+
+How do you check if the ANOVA assumptions are satisfied?
+
+* You must use a QQ-plot to assess the normality of the data.
+
+What do you say about your conclusions if the assumptions aren't satisfied?
+
+* We cannot accept these conclusions because the results will be heavily swayed by non-normal data in any of the groups and non-equal variance between the groups. For comparison sake, the groups must be fairly similar in how they each distribute themselves and each distribution must be normal.
+
+
 
 
 

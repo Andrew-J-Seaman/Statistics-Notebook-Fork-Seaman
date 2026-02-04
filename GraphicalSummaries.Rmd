@@ -735,7 +735,7 @@ In this example, each "bin" spans 365 days (Jan. 1 - Dec. 31 of each year). Sinc
 
 ```{r, echo=FALSE}
 revs <- read.csv("./Data/DCRevelationDates.csv", header=TRUE)
-revs$Date <- as.Date(revs$Date, "%d %b %Y")
+revs$Date <- as.Date(revs$Date, format="%d %b %Y")
 breaks <- c(-53692, -53327, -52961, -52596, -52231, -51866, -51500, 
             -51135, -50770, -50405, -50039, -49674, -49309, -48944, 
             -48578, -48213, -47848, -47483, -47117, -46752, -46387, 
