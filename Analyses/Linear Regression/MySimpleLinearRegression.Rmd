@@ -1,57 +1,69 @@
 ---
 title: "Simple Linear Regression"
+subtitle: "MATH 325 - Brother Saunders"
+author: "Andrew Seaman"
+date: "02-10-2026"
 output: 
   html_document:
     theme: space
     code_folding: hide
     toc: true
     toc_float: true
-    toc_depth: 3
-editor_options: 
-  chunk_output_type: console
+    toc_depth: 6
+  
 ---
 
 <!-- ————————————————————————————————————————————————————————————
-DIRECTIONS
+INSTRUCTIONS
 —————————————————————————————————————————————————————————————— -->
 ```{r directions, echo=FALSE}
-# DIRECTIONS:
-# 
 # Come up with a simple linear regression of your own creation. 
-# 
+
 # * Write the Background and clearly state your question. Then collect data and perform the linear regression analysis in order to answer your question. Use the proper order of first, ask the question, then second, figure out the answer.
-# 
+ 
 # * You should collect both the quantitative response variable and the quantitative explanatory variable yourself. This can be data you collect from 
 #     - the internet (like weather data, Facebook data, or sports data) 
 #     - your own experiment 
 #     - your own observational study
 # * However,     
 #     - The data should not be a single pre-existing dataset. It must be something that you piece together yourself.
-# 
+ 
 # * You need at least $n=3$ $(X,Y)$ pairs to perform the regression. However, your regression will only be useful if you can get around $n=10$ or more observations.
-# 
+
 # You can use either:
-# 
+
 #   someName <- read.csv("../Data/YourDataFileName.csv", header=TRUE)
-# 
+
 # or:
-# 
+ 
 #   library(readr)
 #   someName <- read_csv("../Data/YourDataFileName.csv")
-# 
-# 
+ 
+ 
 # Do not forget to run: "Session -> Set Working Directory -> To Source file location"
 ```
+
+
+## Preparation {.tabset .tabset-pills .tabset-fade}
+
+<!--———————————————————————————————————————————————————————————
+BACKGROUND
+————————————————————————————————————————————————————————————-->
+### Background
+
+The [iPhone](https://www.apple.com/iphone/) in tandem with the [Apple Watch](https://www.apple.com/watch/) record numerous health metrics for the user/wearer made accessible in the [IOS Health App](https://www.apple.com/health/). Per Apple's promotions, users are intended to use these metrics to set goals and train more effectively. One intriguing metric to avid and casual health conscious users alike is daily step count. Measurements are more accurate for individuals who use an Apple Watch because a wearable devices tend to be on the user's person more consistently than they have their phone on them.
+
+The author first began collecting health metrics with an [Iphone SE](https://en.wikipedia.org/wiki/IPhone_SE_(1st_generation)) in 2017 and began using an older generation Apple Watch in 2024. By February of 2025 the author had purchased an [Apple Watch 10](https://theapplewiki.com/wiki/Apple_Watch_Series_10) which was able to record aditional health metrics including heart rate.
+
+<!-- ^^^^^^^^^^^^^^^^^^ GRAB THE LINK: Apple watch 10 -->
 
 <!--———————————————————————————————————————————————————————————
 SETUP
 ————————————————————————————————————————————————————————————-->
 
-## Setup {.tabset .tabset-pills .tabset-fade}
+### Setup
 
-### Show
-
-For this analysis several code libraries were relied on to perform the statistical tests. Next, the author's health data was imported and cleaned up to upgrade the readability of the data.
+First, several code libraries were used to perform the statistical tests.
 
 <!-- LIBRARIES -->
 <details>
@@ -59,68 +71,98 @@ For this analysis several code libraries were relied on to perform the statistic
 
 These **libraries** are used to reproduce this analysis.
 
-```{r library-import, class.source = 'fold-show', message=FALSE, warning=FALSE}
+```{r libraries, class.source = 'fold-show', message=FALSE, warning=FALSE}
 # Libraries
 library(tidyverse)
 library(mosaic)
 library(car)
 library(pander)
 library(readr) # Used to import the data
+library(scales) # Needed? ChatGPT gave it to me when helping me write the big plotting function (jitter-box-line-plot 1 and 2)
+library(directlabels)
 #library(lubridate) # For date extraction in the 2nd plot of the Graphics section
 ```
 </details>
 
+</BR>
 
-<!-- DATA IMPORT -->
+<!-- DATA -->
+
+Next, the author's health data was imported and cleaned to improve readability.
+
 <details>
 <summary><strong>Data</strong></summary>
 
 This **data** is imported locally and the date field data type is set to a date type.
 
-```{r data-import, class.source = 'fold-show'}
+```{r dataset, class.source = 'fold-show'}
 # Data import
-file_path <- "../../Data/iosHealth/health_export_2026-01-12.csv"
-health <- read_csv(file_path, col_types = cols(Date = col_date(format = "%m/%d/%y")))
+# file_path <- "../../Data/iosHealth/health_export_2026-01-12.csv"
+# health <- read_csv(file_path, col_types = cols(Date = col_date(format = "%m/%d/%y")))
+
+health <- read_csv("../../Data/iosHealth/IOS_health_2017-2026.csv",
+    col_types = cols(Date = col_date(format = "%m/%d/%y")))
+
+#  [1] "Date"                                        
+#  [2] "Cycling Distance (sum)"                      
+#  [3] "Exercise Minutes (sum)"                      
+#  [4] "Lean Body Mass (most recent)"                
+#  [5] "Walking/Running Distance (sum)"              
+#  [6] "Walking HR Avg (average)"                    
+#  [7] "Mindful Minutes (sum)"                       
+#  [8] "Body Temperature (Average) (average)"        
+#  [9] "Basal Energy (sum)"                          
+# [10] "Blood Glucose (Most Recent) (most recent)"   
+# [11] "Heart Rate (average)"                        
+# [12] "Flights Climbed (sum)"                       
+# [13] "Headphone Audio (average)"                   
+# [14] "Respiratory Rate (average)"                  
+# [15] "Body Fat % (most recent)"                    
+# [16] "Environmental Audio (average)"               
+# [17] "Swimming Distance (sum)"                     
+# [18] "Blood Oxygen (average)"                      
+# [19] "Body Temperature (Most Recent) (most recent)"
+# [20] "Sleep (sum)"                                 
+# [21] "BP Diastolic (Average) (average)"            
+# [22] "VO2 Max (most recent)"                       
+# [23] "BP Systolic (Most Recent) (most recent)"     
+# [24] "BP Systolic (Average) (average)"             
+# [25] "Blood Glucose (Average) (average)"           
+# [26] "Sleep (Core) (sum)"                          
+# [27] "Total Energy (sum)"                          
+# [28] "HRV (SDNN) (average)"                        
+# [29] "BP Diastolic (Most Recent) (most recent)"    
+# [30] "Steps (sum)"                                 
+# [31] "Weight (Most Recent) (most recent)"          
+# [32] "Resting Heart Rate (average)"                
+# [33] "Sleep (REM) (sum)"                           
+# [34] "Sleep (Asleep) (sum)"                        
+# [35] "Sleep (Deep) (sum)"  
+
 ```
 
 <!-- DATA CLEANING -->
+
 Lastly, the original **column names** were cleaned up.
 
-<!-- Renmame Fields -->
+<!-- Clean Data -->
 ```{r rename-fields, class.source = 'fold-show'}
-# Rename fields
+# Select columns, filter by year, and rename fields
 health <- health %>% 
   rename(
-    Heart.Rate = `Heart Rate (average)`,
-    Sleep.Sum = `Sleep (sum)`,
-    Sleep.Core = `Sleep (Core) (sum)`,                
-    Sleep.Deep = `Sleep (Deep) (sum)`,           
-    Sleep.Asleep = `Sleep (Asleep) (sum)`,          
-    Sleep.REM = `Sleep (REM) (sum)`,         
-    Weight = `Weight (Most Recent) (most recent)`,
+    HeartRate = `Heart Rate (average)`,
     Steps = `Steps (sum)`
-  )
+  ) %>% 
+  select(Date, HeartRate, Steps) %>% 
+  filter(year(Date) >= 2022)
 ```
 
 <!-- Add `Year` Column -->
   <!-- Extract year value from `Date` column. -->
-```{r}
+```{r add-date-col}
 health <- mutate(health, Year = year(Date))
 ```
 </details>
-
-### Hide
-
-
-
-<!--———————————————————————————————————————————————————————————
-BACKGROUND
-————————————————————————————————————————————————————————————-->
-## Background {.tabset .tabset-pills .tabset-fade}
-
-### Show
-
-The [iPhone](https://www.apple.com/iphone/) in tandem with the [Apple Watch](https://www.apple.com/watch/) record numerous health metrics for the user/wearer made accessible in the [IOS Health App](https://www.apple.com/health/). Per Apple's promotions, users are intended to use these metrics to set goals and train more effectively. One intriguing metric to avid and casual health conscious users alike is daily step count. Measurements are more accurate for individuals who use an Apple Watch because a wearable devices tend to be on the user's person more consistently than they have their phone on them.
 
 ### Hide
 
@@ -130,19 +172,21 @@ The [iPhone](https://www.apple.com/iphone/) in tandem with the [Apple Watch](htt
 <!--———————————————————————————————————————————————————————————
 ANALYSIS
 ————————————————————————————————————————————————————————————-->
+
 ## Analysis
 
-#### Hypothesis
+> #### Hypothesis
 
-This analysis aims to model the actual daily total steps (*Total Steps*) of an individual according to their recorded daily average heart rate (*Avg Heart Rate*). Mathematically, 
+This analysis aims to model the actual daily average heart rate (*Avg Heart Rate*) of an individual according to their recorded daily total steps (*Total Steps*). Mathematically,
 
 <!-- TeX commands taken from:
 https://byuistats.github.io/Statistics-Notebook/Analyses/Linear%20Regression/Examples/BodyWeightSLR.html# -->
+
 $$
-\underbrace{Y_i}_\text{Total Steps} = \beta_0 + \beta_1 \underbrace{X_i}_\text{Reported Avg Heart Rate} + \epsilon_i \quad \text{where} \ \epsilon_i \sim N(0, \sigma^2)
+\underbrace{Y_i}_\text{Avg Heart Rate} = \beta_0 + \beta_1 \underbrace{X_i}_\text{Total Steps} + \epsilon_i \quad \text{where} \ \epsilon_i \sim N(0, \sigma^2)
 $$
 
-The hypotheses to follow closely observe the slope of the regression model, $\beta_1$. If $\beta_1$ (slope) is 0, then we're confident that between *Total Steps* and reported *Avg Heart Rate* there is not a meaningful relationship.
+The hypotheses below closely observe the **true slope** of the regression model, $\beta_1$. If $\beta_1$ is 0, then we're confident that between *Avg Heart Rate* and reported *Total Steps* there is not a meaningful relationship. The linear regression model would be considered neither positive nor negative but *dead* where the one variables does not impact the other.
 
 $$
 H_0: \beta_1 = 0 \\  
@@ -152,48 +196,140 @@ $$
 
 
 
-#### Graphics
+> #### Graphics
 
-The scatterplot below show the inter- and intra-year distribution of `Total Steps` by day from 2022-2026. There is a noticeable spike in the middle of 2024. The individual was employed to do outdoor work and averaged **≥ 20,000** steps daily for a few months from July-August.
+First, plotting each variable and looking for univariance—or variance within itself—is apparent before comparing the varaibles looking for covariance—or one variable affects the other.
 
-<!-- Plot Setup: Base plot Variable: Daily Total Setps Over Time (5 yrs) -->
-```{r}
-# Base Plot
-p_total_steps <-   ggplot(health, aes(x = Year, y = Steps, color = factor(Year))) +
-    scale_color_brewer(palette = "Set1", name = "Year")+  # High contrast palette
+<!-- Plot Setup: Base plot Variable: Daily Total {var} Over Time (5 yrs) -->
+```{r fig1-help}
+# 1) Function: df of means by Year
+df_means <- function(df, var) {
+  df %>%
+    filter(!is.na({{ var }}), !is.na(Year)) %>%
+    group_by(Year) %>%
+    summarize(mean = mean({{ var }}, na.rm = TRUE), .groups = "drop")
+}
+
+# 2) Function: counts of non-missing points by Year
+df_counts <- function(df, var) {
+  df %>%
+    filter(!is.na({{ var }}), !is.na(Year)) %>%
+    count(Year, name = "Points")
+}
+
+# 3) Function: Jitter Box Line Plot
+jitter_box_line_plot <- function(df, var, title, subtitle, ylab) {
+
+  df_clean <- df %>%
+    filter(!is.na({{ var }}), !is.na(Year))
+
+  year_levels <- sort(unique(df_clean$Year))
+
+  ggplot(df_clean, aes(x = factor(Year), y = {{ var }}, color = factor(Year))) +
+    geom_boxplot(outlier.alpha = 0) +
+    geom_jitter(alpha = 0.1, width = 0.2) +
+    geom_line(
+      data = df_means(df, {{ var }}),
+      aes(x = factor(Year), y = mean, group = 1),
+      inherit.aes = FALSE
+    ) +
+    geom_label(
+      data = df_counts(df, {{ var }}),
+      aes(x = factor(Year), y = Inf, label = Points),
+      vjust = 1.5,
+      show.legend = FALSE,
+      inherit.aes = FALSE
+    ) +
+    annotate(
+      "text",
+      x = as.character(min(year_levels)),  # leftmost year (factor-safe)
+      y = Inf,
+      label = "Points:",
+      vjust = 2,
+      hjust = 1.5
+    ) +
+    labs(title = title, subtitle = subtitle, y = ylab ) +
+    scale_color_brewer(palette = "Set1", name = "Year") +
     theme_bw() +
     theme(
-      legend.position = "null"
+      legend.position = "none",
+      plot.margin = margin(10, 30, 10, 10)
     ) +
-    labs(
-      title = "Daily Total Steps Over Time (5 yrs)",
-      subtitle = "Densest: 2023-2025; Spike: mid-to-late 2024"
-    )
+    coord_cartesian(clip = "off")
+}
+```
 
-# Dataframe of counts
-df_counts <- health %>% 
-  group_by(Year) %>% 
-  summarize(
-    Points = n()
+Variable: **`Heart Rate`**
+
+The scatterplot below shows the inter- and intra-year distribution of `Daily Average Heart Rate` from 2022-2026
+
+<!-- Plot: Boxplot + Scatterplot: Daily {Avg Heart rate} Over Time (5 yrs) -->
+```{r fig2-avg-heart-rate, warning=FALSE, message=FALSE}
+jitter_box_line_plot(
+  health,
+  HeartRate,
+  "Daily Average Heart Rate Year-Over-Year (5 yrs)",
+  "Densest: 2024-2025",
+  "Heart Rate"
+)
+```
+
+Variable: **`Steps`**
+
+The scatterplot below shows the inter- and intra-year distribution of `Daily Total Steps` from 2022-2026. There is a noticeable spike in the middle of 2024. The individual was employed to do outdoor work and averaged **≥ 20,000** steps daily for a few months from July-August.
+
+<!-- Plot: Boxplot + Scatterplot: Daily {Total Steps} Year-Over-Year (5 yrs) -->
+```{r fig2-total-steps, warning=FALSE, message=FALSE}
+jitter_box_line_plot(
+  health,
+  Steps,
+  "Daily Total Steps Year-Over-Year (5 yrs)",
+  "Densest: 2023-2025; Spike: mid-to-late 2024",
+  "Steps"
+)
+```
+
+
+<!-- Showing dad how to build a covariable scatterplot to observe covariance: -->
+```{r}
+ggplot(health, aes(x = HeartRate, y = Steps)) +
+  geom_point(color = "white", pch = 19, size = 0.5) +
+  theme_bw() +
+  theme(
+    panel.background = element_rect(fill = "black"),
+    plot.background  = element_rect(fill = "black"),
+    panel.border     = element_rect(color = "white"),
+
+    text = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+
+    panel.grid.major = element_line(color = "grey30"),
+    panel.grid.minor = element_line(color = "grey20")
+  ) +
+  labs(
+    title = "More daily steps predict higher daily average heart rate",
+    x = "Daily Avg Heart Rate",
+    y = "Daily Total Steps"
+  )+
+  geom_vline(
+    xintercept = c(
+      mean(health$HeartRate, na.rm = TRUE),
+      median(health$HeartRate, na.rm = TRUE)
+    ), 
+    color = c("red","green")
+  )+
+  geom_hline(
+    yintercept = c(
+      mean(health$Steps, na.rm = TRUE),
+      median(health$Steps, na.rm = TRUE)
+    ), 
+    color = c("red","green")
   )
 ```
 
-<!-- Plot: Boxplot + Scatterplot: Daily Total Steps Over Time (5 yrs) -->
-```{r}
-p_total_steps +
-  geom_boxplot() +
-  geom_jitter(alpha = .1) +
-  geom_label(data = df_counts, 
-             aes(x = Year, y = Inf, label = Points),
-             vjust = 1.5,
-             show.legend = FALSE)+
-  annotate("text", 
-           x = 2022, 
-           y = Inf, 
-           label = "Points:", 
-           vjust = 2,
-           hjust = 1.5)
-```
+
+
 
 <!-- Plot: Distribution Curves -->
 ```{r}
@@ -228,7 +364,7 @@ EXPLORATION
 NO LONGER USED
 **********************************************************-->
 
-```{r}
+```{r not-in-use, include=FALSE, execute=FALSE, echo=FALSE}
 # WHAT: This code was from an original attempt to use exported IOS Health App data ingested as an XML and restructured as a workable dataframe. However, due to the size of the XML data file I turned on LFS (large file storage) to facilitate hosting my forked Statistics Notebook on GitHub. That removed the original XML file(s) and replaced them with hooks as LFS does. This however broke the connection I needed to use the data in RStudio for my analysis. I've since then changed gears and used a third party IOS to export the my health data directly as a CSV which will be used instead up above.
 # 
 # ```{r 0.1, echo=FALSE, message=FALSE, warning=FALSE}
