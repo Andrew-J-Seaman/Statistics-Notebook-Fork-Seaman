@@ -1,16 +1,18 @@
 ---
-title: "Simple Linear Regression"
+title: "Multiple Linear Regression"
 subtitle: "MATH 325 - Brother Saunders"
 author: "Andrew Seaman"
-date: "02-10-2026"
+date: "02-17-2026"
 output: 
+  
   html_document:
     theme: space
     code_folding: hide
     toc: true
     toc_float: true
     toc_depth: 6
-  
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- ————————————————————————————————————————————————————————————
@@ -167,6 +169,13 @@ health <- health %>%
   <!-- Extract year value from `Date` column. -->
 ```{r add-date-col}
 health <- mutate(health, Year = year(Date))
+```
+
+<!-- Add Dummy Column: "Is 2023?" -->
+```{r add_dummy_col_2023}
+health <- health %>% 
+  mutate(
+    is_2023 = ifelse(Year == 2023, 1, 0))
 ```
 </details>
 
@@ -333,61 +342,176 @@ Although the plots above hint at a time trend in the data, returning to the prim
 
 <!-- Plot: Comparing both variables -->
 ```{r plot_covariance, warning=FALSE, message=FALSE}
-# NOTE FOR BROTHER SAUNDERS (2/17/26):
-#   - I figured out why the lm (blue line) didn't pass through xbar and y bar (red lines intersection)
-#   - The means, medians, and lm were all calculated using different subsets.
-#   - If a row had Heart Rate but not steps the mean and median line would include that row.
-#   - However, lm requires both Heart Rate and Steps to have a value (or be finte) for plotting
+# ATTEMPT 1
+# ——————————————————————————————————————————————
 
 
+# # NOTE FOR BROTHER SAUNDERS (2/17/26):
+# #   - I figured out why the lm (blue line) didn't pass through xbar and y bar (red lines intersection)
+# #   - The means, medians, and lm were all calculated using different subsets.
+# #   - If a row had Heart Rate but not steps the mean and median line would include that row.
+# #   - However, lm requires both Heart Rate and Steps to have a value (or be finte) for plotting
+# 
+# 
+# # Clean df where both variables have value in the same row
+# df_finite <- health %>% 
+#   filter(is.finite(HeartRate), is.finite(Steps))
+# 
+# df_2023 <- df_finite %>% 
+#   filter(is_2023 == 1)
+# 
+# # Line colors
+# meanR_medianG <- c("red","green")
+# 
+# 
+# 
+# # > Plot Start
+# ggplot(df_finite, aes(x = HeartRate, y = Steps, color=as.factor(Year))) +
+# # > Scatterplot
+#   geom_point(pch = 19, size = 0.5) +
+# # > Base theme
+#   theme_bw() +
+# # > Custom theme
+#   theme(
+# #   > Black background and white border
+#     panel.background = element_rect(fill = "black"),
+#     plot.background  = element_rect(fill = "black"),
+#     panel.border     = element_rect(color = "white"),
+# #   > White text
+#     text = element_text(color = "white"),
+#     axis.text = element_text(color = "white"),
+#     axis.title = element_text(color = "white"),
+# #   > Grey grid lines
+#     panel.grid.major = element_line(color = "grey30"),
+#     panel.grid.minor = element_line(color = "grey20"),
+#     legend.position = "none"
+#   )+
+# # > Custom titles/labels
+#   labs(
+#     title = "More daily steps predict higher daily average heart rate",
+#     subtitle = "Green: median; Red: mean; Blue: Linear Model",
+#     x = "Daily Avg Heart Rate",
+#     y = "Daily Total Steps")+
+# # > Vertical Lines
+#   geom_vline(
+#     xintercept = c(mean(df_finite$HeartRate), median(df_finite$HeartRate)),
+#     color = meanR_medianG,
+#     linetype = "dashed")+
+# # > Horizontal Lines
+#   geom_hline(
+#     yintercept = c(mean(df_finite$Steps), median(df_finite$Steps)),
+#     color = meanR_medianG,
+#     linetype = "dashed")+
+# # > Linear Model Line: ALL
+#   geom_smooth(
+#     method = "lm",
+#     color = "grey50",
+#     fill = "grey50",
+#     se = FALSE)+
+# # > Linear Model Line: 2023
+#   geom_smooth(
+#     aes(data = df_2023, x = HeartRate, y = Steps),
+#     method = "lm",
+#     se = TRUE
+#   )
+```
+
+
+```{r scatterplot_bivarite_by_year, message=FALSE, warning=FALSE}
+# ATTEMPT 2 (works!)
+# ——————————————————————————————————————————————
 # Clean df where both variables have value in the same row
 df_finite <- health %>% 
-  filter(is.finite(HeartRate), is.finite(Steps))
+  filter(is.finite(HeartRate), is.finite(Steps), !is.na(Year))
 
-# Line colors
-meanR_medianG <- c("red","green")
+df_2023 <- df_finite %>% 
+  filter(Year == 2023)   # (or is_2023 == 1 if that column exists)
+
+df_not_2023 <- df_finite %>%
+  filter(Year != 2023)
+
+meanR_medianG <- c("red", "green")
 
 
 
-# > Plot Start
-ggplot(df_finite, aes(x = HeartRate, y = Steps)) +
-# > Scatterplot
-  geom_point(color = "white", pch = 19, size = 0.5) +
-# > Base theme
+ggplot(df_finite, aes(x = HeartRate, y = Steps, color = as.factor(Year))) +
+  geom_point(data = df_2023, color = "#F8766D", pch = 1, size = 2, stroke = 1) +
+  geom_point(data = df_2023, color = "#F8766D", pch = 19, size = 0.5) +
+  geom_point(color = "grey60", pch = 19, size = 0.5, alpha = .5) +
   theme_bw() +
-# > Custom theme
   theme(
-#   > Black background and white border
     panel.background = element_rect(fill = "black"),
     plot.background  = element_rect(fill = "black"),
     panel.border     = element_rect(color = "white"),
-#   > White text
     text = element_text(color = "white"),
     axis.text = element_text(color = "white"),
     axis.title = element_text(color = "white"),
-#   > Grey grid lines
     panel.grid.major = element_line(color = "grey30"),
     panel.grid.minor = element_line(color = "grey20"),
-    legend.background = element_rect(fill = "black", color = NA)
-    # legend.position = "none"
-  )+
-# > Custom titles/labels
+    legend.position = "none"
+  ) +
   labs(
-    title = "Higher daily average heart rate predicts higher daily total steps",
-    subtitle = "Green: median; Red: mean; Blue: Linear Model",
+    title = "More daily steps predict higher daily average heart rate",
+    subtitle = "Green: median; Red: mean; Blue: 2023 Linear Model (others grey, no CI)",
     x = "Daily Avg Heart Rate",
-    y = "Daily Total Steps")+
-# > Vertical Lines
+    y = "Daily Total Steps"
+  ) +
   geom_vline(
     xintercept = c(mean(df_finite$HeartRate), median(df_finite$HeartRate)),
-    color = meanR_medianG)+
-# > Horizontal Lines
+    color = meanR_medianG,
+    linetype = "dashed"
+  ) +
   geom_hline(
     yintercept = c(mean(df_finite$Steps), median(df_finite$Steps)),
-    color = meanR_medianG)+
-# > Linear Model Line
-  geom_smooth(method = "lm")
+    color = meanR_medianG,
+    linetype = "dashed"
+  ) +
+
+  # ---- Smooth lines for 2024–2026: gray, NO cloud, one per year ----
+  geom_smooth(
+    data = df_not_2023,
+    aes(x = HeartRate, y = Steps, group = Year),
+    method = "lm",
+    se = FALSE,
+    inherit.aes = FALSE,
+    color = "grey60",
+    linetype = "dashed"
+  ) +
+  
+  # geom_smooth(method = "lm", se = FALSE, linetype = "dashed")+
+
+  # ---- Smooth line for 2023: colored + cloud ----
+  geom_smooth(
+    data = df_2023,
+    aes(x = HeartRate, y = Steps),
+    method = "lm",
+    se = TRUE,
+    inherit.aes = FALSE,
+    color = "#F8766D",
+    fill = "#F8766D",
+    alpha = 0.15
+  )+
+  geom_dl(label = df_finite$Year,
+          method = list(
+            "first.points",
+            hjust = c(1.1,0,.8,1.3),
+            vjust = c(3.5,-11,-3.5,-9.5)
+          )
+  )
+
+  # scale_color_manual(color = c("deepskyblue", "grey60", "grey60", "grey60"))
 ```
+
+
+
+```{r}
+# 
+```
+
+
+
+
+
 
 
 ## Test
@@ -440,101 +564,6 @@ IDEAS
 <!--———————————————————————————————————————————————————————————
 EXPLORATION 
 ————————————————————————————————————————————————————————————-->
-
-
-<!-- Plot: Distribution Curves -->
-```{r exploration_1, echo=FALSE,include=FALSE}
-# p_total_steps +
-#   geom_density(aes(y=Steps, x = Year))
-  # geom_jitter(alpha = .1) +
-  # geom_label(data = df_counts, 
-  #            aes(x = Year, y = Inf, label = Points),
-  #            vjust = 1.5,
-  #            show.legend = FALSE)+
-  # annotate("text", 
-  #          x = 2022, 
-  #          y = Inf, 
-  #          label = "Points:", 
-  #          vjust = 2,
-  #          hjust = 1.5)
-```
-
-
-
-
-
-
-<!--*********************************************************
-NO LONGER USED
-**********************************************************-->
-
-```{r not-in-use, include=FALSE, execute=FALSE, echo=FALSE}
-# WHAT: This code was from an original attempt to use exported IOS Health App data ingested as an XML and restructured as a workable dataframe. However, due to the size of the XML data file I turned on LFS (large file storage) to facilitate hosting my forked Statistics Notebook on GitHub. That removed the original XML file(s) and replaced them with hooks as LFS does. This however broke the connection I needed to use the data in RStudio for my analysis. I've since then changed gears and used a third party IOS to export the my health data directly as a CSV which will be used instead up above.
-# 
-# ```{r 0.1, echo=FALSE, message=FALSE, warning=FALSE}
-# # ———————————————————————————————————————————————————————————————
-# # DATA SOURCE (1): IOS Health App Data
-# # ———————————————————————————————————————————————————————————————
-# 
-# 
-# # STEP 1:
-# ## Full file path: "/Users/andrewseaman/Desktop/2.STATS/Statistics-Notebook-master/Data/IOSHealth/apple_health_export/sleep-data.xml"
-# 
-# ## Load the XML file
-# xml_file <- xmlParse("../../Data/IOSHealth/apple_Health_export/sleep-data.xml")# Replace with your file path
-# root <- xmlRoot(xml_file)
-# 
-# 
-# # STEP 2:
-# ## Extract all 'Record' nodes
-# records <- xmlToDataFrame(nodes = getNodeSet(root, "//Record"))
-# 
-# ## Filter only sleep data
-# sleep_data <- records %>%
-#   filter(type == "HKCategoryTypeIdentifierSleepAnalysis") %>%
-#   select(type, startDate, endDate, value)
-# 
-# 
-# # STEP 3:
-# ## Convert to Date format
-# sleep_data <- sleep_data %>%
-#   mutate(
-#     startDate = as_datetime(startDate),
-#     endDate = as_datetime(endDate),
-#     date = as_date(startDate)  # Extract only the date
-#   ) %>%
-#   filter(date >= as_date("2025-02-16") & date <= as_date("2025-02-25"))  # Filter target dates
-# 
-# 
-# # STEP 4:
-# # Rename sleep stages (Apple's values)
-# sleep_data <- sleep_data %>%
-#   mutate(sleep_stage = case_when(
-#     value == "HKCategoryValueSleepAnalysisAwake" ~ "Awake",
-#     value == "HKCategoryValueSleepAnalysisREM" ~ "REM",
-#     value == "HKCategoryValueSleepAnalysisCore" ~ "Core",
-#     value == "HKCategoryValueSleepAnalysisDeep" ~ "Deep",
-#     TRUE ~ "Other"
-#   ))
-# 
-# 
-# # STEP 5:
-# ## Summarize Total Sleep Durations Per Day
-# sleep_summary <- sleep_data %>%
-#   mutate(duration = as.numeric(difftime(endDate, startDate, units = "mins"))) %>%  # Compute duration
-#   group_by(date, sleep_stage) %>%
-#   summarise(total_minutes = sum(duration), .groups = "drop") %>%
-#   pivot_wider(names_from = sleep_stage, values_from = total_minutes, values_fill = 0)  # Pivot for readability
-# 
-# 
-# # STEP 6:
-# ## View the data
-# pander(sleep_summary)
-# 
-# ```
-```
-
-
 
 
 <!--———————————————————————————————————————————————————————————
