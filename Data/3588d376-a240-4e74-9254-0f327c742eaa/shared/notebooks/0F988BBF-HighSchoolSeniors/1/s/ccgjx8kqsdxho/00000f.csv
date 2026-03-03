@@ -1,0 +1,7 @@
+"0","# New dataframe: focus columns (2) alone"
+"0","# Select and rename two columns for later graphing."
+"0","HSS2 <- HSS %>%"
+"0","  select("
+"0","    memory = Score_in_memory_game,"
+"0","    activity = Favourite_physical_activity"
+"0","  )"

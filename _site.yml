@@ -16,29 +16,29 @@ navbar:
           href: External-Links.html
     - text: "Analyses"
       menu:
-        - text: "Good Example Analysis"
+        - text: "Example - Good Analysis"
           href: ./Analyses/StudentHousing.html
-        - text: "Poor Example Analysis"
+        - text: "Example - Poor Analysis"
           href: ./Analyses/StudentHousingPOOR.html
-        - text: "Rent"
+        - text: "W01 - Rent"
           href: ./Analyses/Rent.html
-        - text: "Stephanie"
+        - text: "W02-W03 - Stephanie"
           href: ./Analyses/Stephanie.html
-        - text: "High School Seniors"
+        - text: "W04 - High School Seniors"
           href: ./Analyses/t Tests/HighSchoolSeniors.html
-        - text: "Recalling Words"
+        - text: "W05 - Recalling Words (Wilcoxon)"
           href: ./Analyses/Wilcoxon Tests/RecallingWords.html
-        - text: "My Two-way ANOVA"
+        - text: "W06 - My Two-way ANOVA"
           href: ./Analyses/ANOVA/MyTwoWayANOVA.html
-        - text: "Food"
+        - text: "W07 - Food (Kruskal-Wallis)"
           href: ./Analyses/Kruskal-Wallis Test/Food.html
-        - text: "My Simple Linear Regression"
+        - text: "W08 - My Simple Linear Regression"
           href: ./Analyses/Linear Regression/MySimpleLinearRegression.html
-        - text: "Car Prices"
-          href: ./Analyses/Linear Regression/CarPrices.html
-        - text: "My Logistic Regression"
+        - text: "W09 - My Multiple Linear Regression"
+          href: ./Analyses/Linear Regression/MyMultipleLinearRegression.html
+        - text: "W10 - My Simple Logistic Regression"
           href: ./Analyses/Logistic Regression/MyLogisticRegression.html
-        - text: "My Chi-sqaured Test"
+        - text: "W12 - My Chi-sqaured Test"
           href: ./Analyses/Chi Squared Tests/MyChiSquaredTest.html
     - text: "Describing Data"
       menu:

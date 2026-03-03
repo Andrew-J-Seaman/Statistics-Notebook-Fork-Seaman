@@ -1,0 +1,2 @@
+"0","# Data import"
+"0","HSS <- read_csv(""../../Data/HighSchoolSeniors.csv"")"

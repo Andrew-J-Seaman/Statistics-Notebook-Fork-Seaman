@@ -1,0 +1,27 @@
+{
+    "id": "F92FBC62",
+    "path": "~/Desktop/Semester/1.MATH325/Repository/Statistics-Notebook-Fork-Seaman/Analyses/Linear Regression/MySimpleLinearRegression.Rmd",
+    "project_path": "Analyses/Linear Regression/MySimpleLinearRegression.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1771881907260.0,
+    "source_on_save": true,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "61,153",
+        "scrollLine": "0",
+        "chunk_output_type": "console"
+    },
+    "folds": "20|29|45|0|\n492|46|506|0|\n517|59|581|0|\n",
+    "lastKnownWriteTime": 1771890553,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1771890553979,
+    "read_only": false,
+    "read_only_alternatives": []
+}

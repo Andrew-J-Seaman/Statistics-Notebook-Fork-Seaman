@@ -1,0 +1,8 @@
+"0","# Scatterplot: focus columns (all activities: 'Favourite_physical_activity')"
+"0","("
+"0","  ggplot(HSS2, aes(y = activity, x = memory, color = activity))"
+"0","    + geom_point()"
+"0","    + theme("
+"0","      legend.position = ""none"""
+"0","    )"
+"0",")"

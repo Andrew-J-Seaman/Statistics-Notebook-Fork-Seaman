@@ -1,0 +1,7 @@
+"0","HSS <- HSS %>%"
+"0","  mutate("
+"0","    recycling_than_water = ifelse("
+"0","      Importance_recycling_rubbish > Importance_conserving_water, "
+"0","      ""Recycling More Important"", "
+"0","      ""Water Conservation More Important"")"
+"0","    )"
