@@ -2,23 +2,19 @@
 title: "Food at College"
 subtitle: "MATH 325"
 author: "Andrew Seaman"
-date: 2025-Jun-27
+date: "06/27/2025"
+date-modified: "03/03/2026"
 output: 
   html_document:
-    theme: journal
+    theme: flatly
     toc: true
-    toc_float: false #true
+    toc_float: true
     toc-level: 3
     highlight: pygment
     code_folding: hide
+editor_options: 
+  chunk_output_type: console
 ---
-
-```{=html}
-<!--******************************************************
-LAST UPDATED: 2025-07-06
-BY: Andrew Seaman
-*******************************************************-->
-```
 
 <!-- Today's date -->
 
@@ -31,11 +27,10 @@ if (interactive()) {
 # Next, paste after 'LAST UPDATED' above
 ```
 
-```{=html}
+
 <!--******************************************************
 Code Table of Contents (Code Toc)
 *******************************************************-->
-```
 
 <!-- Create: Code TOC -->
 
@@ -67,7 +62,7 @@ if (interactive()) {
 }
 ```
 
-```{=html}
+
 <!-- 
 Display: Code TOC
 Updated: 2025-07-06
@@ -86,26 +81,17 @@ Updated: 2025-07-06
    ANALYSIS      875    1113 
 -----------------------------
 -->
-```
 
-```{=html}
-<!--
-.
-.
-.
-.
-.
-.
--->
-```
 
-```{=html}
+
+
+
 <!-------------------------------------------------------
 .                          SETUP                    
 -------------------------------------------------------->
-```
 
-## Setup {.tabset .tabset-fade}
+
+## Introduction {.tabset .tabset-fade}
 
 ### Hide
 
@@ -117,11 +103,13 @@ Updated: 2025-07-06
 
 <!-- Libraries -->
 
-### Libraries
+### Setup
+
+**Libraries**
 
 These libraries provide the tools necessary for this analysis by way of data sourcing, manipulation, and visualization (see chunk).
 
-```{r, warning=FALSE, message=FALSE}
+```{r libs, echo=TRUE, warning=FALSE, message=FALSE}
 library(mosaic)
 library(car)
 library(DT)
@@ -130,21 +118,13 @@ library(readr)
 library(tidyverse) # Includes the 'tidyr' package
 ```
 
-<!-- Format HTML Output -->
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-----
-
 </BR>
 
-### Data
+**Data**
 
 The data source is called __Food__ (see _Background_ for details).
 
-```{r, warning=FALSE, message=FALSE}
+```{r data, echo=TRUE, warning=FALSE, message=FALSE}
 # —————————————
 # INSTRUCTIONS:
 # —————————————
@@ -183,24 +163,14 @@ Notes:
 
 </BR>
 
-```{=html}
-<!--
-.
-.
-.
-.
-.
-.
--->
-```
 
-```{=html}
+
+
+
 <!-------------------------------------------------------
 .                          INSTRUCTIONS                    
 -------------------------------------------------------->
-```
 
-```{=html}
 <!--
 ## Instructions {.tabset .tabset-fade}
 
@@ -602,41 +572,16 @@ This dataset includes information on food choices, nutrition, preferences, child
 </BR>
 
 -->
-```
 
-```{=html}
-<!--
-.
-.
-.
-.
-.
-.
--->
-```
 
-```{=html}
 <!--*****************************************************
 .                          BEGIN ANALYSIS                    
 ******************************************************-->
-```
 
-```{=html}
-<!--
-.
-.
-.
-.
-.
-.
--->
-```
 
-```{=html}
 <!-------------------------------------------------------
 .                          BACKGROUND                    
 -------------------------------------------------------->
-```
 
 ## Background {.tabset .tabset-fade}
 
@@ -657,7 +602,7 @@ This dataset includes information on food choices, nutrition, preferences, child
 
 <!-- Note on the data -->
 
-Note this dataset and description come from: © 2020 Kaggle Inc
+Note: this dataset and description come from: © 2020 Kaggle Inc
 
 For further details visit: [Food choices on Kaggle](https://www.kaggle.com/borapajo/food-choices?select=food_coded.csv)
 
@@ -766,22 +711,10 @@ ncol(food)
 
 </BR>
 
-```{=html}
-<!--
-.
-.
-.
-.
-.
-.
--->
-```
 
-```{=html}
 <!-------------------------------------------------------
 .                          EXPLORATION                    
 -------------------------------------------------------->
-```
 
 ## Exploration {.tabset .tabset-fade}
 
@@ -977,30 +910,25 @@ construct_and_show_datatable(AllCombos_xg)
 
 </BR>
 
-```{=html}
-<!--
-.
-.
-.
-.
-.
-.
--->
-```
 
-```{=html}
 <!-------------------------------------------------------
 .                          ANALYSIS                    
 -------------------------------------------------------->
-```
+
 
 ## Analysis
 
-> **Question:** Does ones' perception of their weight impact their GPA? </BR> **Hypotheses:** We will rely on the standard hypotheses for a Kruskal-Wallis Rank Sum test. </BR> $$
-> H_0: \text{All samples are from the same distribution.}
-> \\
-> H_a: \text{At least one sample's distribution is stochastically different.}
-> $$ **Conclusion:** One's perception of their weight does not significantly bear on the resulting GPA.
+**Question:** Does ones' perception of their weight impact their GPA?
+
+**Hypotheses:** We will rely on the standard hypotheses for a Kruskal-Wallis Rank Sum test.
+
+$$
+H_0: \text{All samples are from the same distribution.}
+\\
+H_a: \text{At least one sample's distribution is stochastically different.}
+$$ 
+
+**Conclusion:** One's perception of their weight does not significantly bear on the resulting GPA.
 
 First, the data are cleaned for plotting and testing. In this case, proper levels are defined for values that have no inherent order such as is the case for the ranking levels found in the `self_perception_weight` variable.
 
@@ -1052,6 +980,10 @@ Second, two selected variables—`Self Perception of Weight` (6 levels) and `GPA
 -   3 - Just right
 -   2 - Very fit
 -   1 - Slim
+
+</BR>
+
+*(Click on the tabs for additional plots)*
 
 #### Boxplot
 
@@ -1117,7 +1049,7 @@ It is shown in these results that the **correlation between the selected variabl
 
 ### Numerical Summary
 
-Lastly, a numerical summary of GPA for each of the factor levels will further confirm the similarlity in GPA scores even when sorted by factor level (`self_perception_weight`).
+Lastly, a numerical summary of GPA for each of the factor levels of SPW (`self_perception_weight`) will further confirm the similarity in GPA scores even when sorted by factor level.
 
 ```{r}
 food2 <- food1 %>% 
@@ -1134,34 +1066,26 @@ pander(fvs)
 Interestingly, when we <u>revise the above boxplots</u> showing key values traced across the factor levels (SPW) with lines it becomes more clear how the outliers of each level skew the mean but not the median compared to other factor levels further confirming our choice of statistical test which uses the median instead of the mean to be the more appropriate option.
 
 <!-- Revised Boxplot (with lines) -->
-```{r}
+```{r boxplot_summaryGPA, fig_height=5}
 ggplot() +
   # boxplots
   geom_boxplot(
     data = food2,
     aes(x = SPW, y = GPA),
     fill = "lightgray",
-    color = "black"
+    color = "black",
+    alpha = .2
   ) +
-  # summary lines
+  # SUMMARY LINES:
   geom_line(
     data = fvs,
-    aes(x = SPW, y = min, group = 1, color = "Min"),
-    alpha = .8, linetype = "dotted"
+    aes(x = SPW, y = mean, group = 1, color = "Mean"), linetype = "dashed", linewidth = 1
   ) +
-  geom_line(
-    data = fvs,
-    aes(x = SPW, y = max, group = 1, color = "Max"),
-    alpha = .8, linetype = "dotted"
-  ) +
-  geom_line(
-    data = fvs,
-    aes(x = SPW, y = median, group = 1, color = "Median")
-  ) +
-  geom_line(
-    data = fvs,
-    aes(x = SPW, y = mean, group = 1, color = "Mean")
-  ) +
+  # geom_line(
+  #   data = fvs,
+  #   aes(x = SPW, y = median, group = 1, color = "Median"), linetype = "solid", linewidth = 1, alpha = .7
+  # ) +
+  scale_color_manual(values = c("red","green"))+
   scale_x_discrete(
     labels = levels(food2$SPW)
   ) +
@@ -1171,7 +1095,12 @@ ggplot() +
     y = "GPA",
     color = "Statistic"
   ) +
-  theme_classic()
+  theme_classic()+
+  theme(
+    legend.position =  c(.7,.2),
+    legend.justification = c("right", "bottom"),
+    
+  )
 ```
 
 We could even look at the entire numerical summary as a <u>dotplot</u> with only the **median** and **mean** plotted with lines of course showing the same trend as above: when outliers pull on the shape of the distribution the mean follows whereas the median does so far less making it the better anchor for estimates reliant on a measure of the tendency towards centrality.

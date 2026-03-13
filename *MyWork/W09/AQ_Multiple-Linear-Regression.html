@@ -1600,15 +1600,34 @@ border-radius: 0px;
 </blockquote>
 <p>[Response]</p>
 <pre class="r"><code># a.
-
+kf2 &lt;- KidsFeet %&gt;% 
+  mutate(gender = ifelse(sex ==&quot;G&quot;, 1, 0))
 
 # b.
-
+mylm &lt;- lm(length ~ width + gender + width:gender, data = kf2)
 
 # c.
-
-
-# d.</code></pre>
+summary(mylm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = length ~ width + gender + width:gender, data = kf2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.6035 -1.0350  0.2049  0.7072  2.0209 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)   10.9314     4.9118   2.226  0.03258 * 
+## width          1.5423     0.5339   2.889  0.00659 **
+## gender        -1.1856     6.6054  -0.179  0.85858   
+## width:gender   0.1170     0.7328   0.160  0.87410   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.051 on 35 degrees of freedom
+## Multiple R-squared:  0.4136, Adjusted R-squared:  0.3634 
+## F-statistic: 8.229 on 3 and 35 DF,  p-value: 0.0002821</code></pre>
 <!-- Q1. End -->
 </div>
 <div id="section-1" class="section level2">
@@ -1617,16 +1636,84 @@ border-radius: 0px;
 <p><em>[Question]</em></p>
 </blockquote>
 <p>[Response]</p>
-<pre class="r"><code># a.
-
-
+<pre class="r"><code>#a. 
+cars &lt;- datasets::cars
 # b.
-
+cars2 &lt;- cars %&gt;% 
+  mutate()
 
 # c.
+mylm &lt;- lm(dist ~ speed + I(speed^2), data=cars2)
 
-
-# d.</code></pre>
+# d.
+summary(mylm) %&gt;% pander()</code></pre>
+<table style="width:88%;">
+<colgroup>
+<col width="25%" />
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>(Intercept)</strong></td>
+<td align="center">2.47</td>
+<td align="center">14.82</td>
+<td align="center">0.1667</td>
+<td align="center">0.8683</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>speed</strong></td>
+<td align="center">0.9133</td>
+<td align="center">2.034</td>
+<td align="center">0.449</td>
+<td align="center">0.6555</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>I(speed^2)</strong></td>
+<td align="center">0.09996</td>
+<td align="center">0.06597</td>
+<td align="center">1.515</td>
+<td align="center">0.1364</td>
+</tr>
+</tbody>
+</table>
+<table style="width:88%;">
+<caption>Fitting linear model: dist ~ speed + I(speed^2)</caption>
+<colgroup>
+<col width="20%" />
+<col width="30%" />
+<col width="12%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Observations</th>
+<th align="center">Residual Std. Error</th>
+<th align="center"><span class="math inline">\(R^2\)</span></th>
+<th align="center">Adjusted <span class="math inline">\(R^2\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">50</td>
+<td align="center">15.18</td>
+<td align="center">0.6673</td>
+<td align="center">0.6532</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># e.</code></pre>
 <!-- Q2. End -->
 </div>
 <div id="section-2" class="section level2">

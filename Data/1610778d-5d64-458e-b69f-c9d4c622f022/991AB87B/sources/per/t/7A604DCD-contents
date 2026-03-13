@@ -1,0 +1,351 @@
+---
+title: "W02 - Task 2"
+subtitle: "Semester Project Brainstorm & Feedback"
+author: "Andrew Seaman"
+date: "01-15-2026"
+date-modified: "03-13-2026"
+format:
+  html-document:
+    toc: true
+    toc-depth: 6
+---
+
+## Setup
+
+
+<!-- Instructions -->
+::: {.callout-note collapse="true"}
+## Instructions
+
+**Steps** 
+
+1. Read the semester [project assignment](https://byuistats.github.io/DS350_assignments/semester_project.html).
+
+2. Develop a few novel questions (at least 4) that data can answer. Consider this a brainstorm of what you might address for your semester project.
+
+* Look for other examples of people addressing your question, or a similar question, online. Include a url to their work if possible.
+* Present your question to a data scientist, data analyst (this can include teachers), or other professional in the field to get feedback on the quality and feasability of the question and if it can be addressed in two months.
+* Get feedback from three to four other people on their interest in your questions.
+* Type up a summary of the feedback you received for each question.
+
+3. Edit the readme.md file in this week’s folder for this assignment so that it contains your potential questions and feedback. Push it to GitHub to be easily shared.
+
+**Submit** </BR>
+In I-learn submit a link to the readme.md file on GitHub.
+
+<!-- Comment out the progress block upon completion -->
+**Progress**
+
+  - [x] Reading
+  - [x] 4 Questions
+  - [x] Related examples
+  - [ ] Present to professionals
+      - [x] 1
+      - [ ] 2
+      - [x] 3
+  - [x] Get feedback (3-4 people)
+      - [x] 1
+      - [x] 2
+      - [ ] 3
+      - [ ] 4
+  - [ ] Type a summary for each question.
+  - [ ] Submit
+:::
+
+<!-- Comment out till here -->
+
+
+::: {.callout-note collapse="true"}
+## Libraries
+<!-- Libraries -->
+```{r}
+#| label: "libraries"
+#| warning: FALSE
+#| message: FALSE
+#| echo: TRUE
+#| code-fold: FALSE
+
+# 1) Import Libraries using the `pacman` package manager
+
+if (!require("pacman")) install.packages("pacman")
+
+library(pacman) # Package manager
+
+p_load(
+  tidyverse,    # Data manipulation
+  ggthemes,     # Color-blind friendly themes
+  #DT,           # Data tabling
+  pander,       # Clean output structuring
+  rio,          # Data import/export
+  #GGally,       # EDA: graphical matrix variable comparison; python equivalent: `seaborn`
+  #lubridate,    # Create date column
+  directlabels  # Better labels
+)
+```
+:::
+
+::: {.callout-note collapse="true"}
+## Reading
+<!-- Read the semester project assignment -->
+### Linked In Learning
+
+Video 3: ***Clarifying Questions*** 
+
+*"Remember, what's obvious to you might not be obvious to everyone else." *
+
+I like this statement because I feel I'm especially aware of this. My way of thinking tends to group me in the cognitive minority most everywhere I go. I'm keen to breakdown ideas and extract the real meaning. Sometimes people are highly intentional and inventive with their language. Other times they piggy-bag off of decades if not centuries of cultural infusion into the language they speak and the phrases they use without processing what they're actually referencing to express their idea to someone else. I do hear what people are saying but I'm also listening to the cultural undertone and using that to scrape additional context and perspective as well.
+
+:::
+
+
+
+
+
+## Questions
+
+1. **Crossroads:** Does the 50% discount promotion at BYU–Idaho Crossroads increase total daily revenue compared to non-discount days due to increased purchase volume?
+
+2. **Pass/Fail:** Do less-experienced professors have higher student failure rates than more tenured<span style="color: red;">\*</span> professors, and does this relationship vary across 100–400 level courses? <span style="color: red;">\*</span><span style="color: #ccb;">(Should I say tenured?)</span>
+
+<!-- Question about word choice in question 2 -->
+
+3. **Salary:** Do average time-to-graduation (number of semesters) differ by major at BYU–Idaho, and is longer time-to-degree associated with higher post-graduation salaries? (*Note: Salaries may need to be measured in time ranges of 5, 10, and 15 years*).
+
+4. **Temperature:** Is average daily temperature during Fall, Winter, and Spring semesters associated with differences in average final course grades at BYU–Idaho over time (year-over-year)? (*Note: This is data-heavy and confounded: Housing, Stress, Course difficulty, Instructor, COVID years, etc...*)
+
+
+
+
+
+## Feedback
+
+<!-- ------------- -->
+<!-- PROFESSIONALS -->
+<!-- ------------- -->
+
+#### **Professional Feedback**
+<!-- Present your question to a data scientist, data analyst (this can include teachers), or other professional in the field to get feedback on the quality and feasibility of the question and if it can be addressed in two months. -->
+
+
+<!-- Professional (1) -->
+<!-- [DR. GARRETT SAUNDERS] -->
+<div style="background-color: rgba(0, 0, 001, .02);">
+> ##### 1) **Dr. Garrett Saunders, PhD**
+*Professor of Statistics at BYU–Idaho*
+>
+> ::: {.callout-note collapse="true"}
+###### Feedback
+> [Faculty Profile](https://www.byui.edu/directories/garrett-saunders) or  [LinkedIn](https://www.linkedin.com/in/garrett-saunders-337754123/)
+>
+> ---
+>
+> **General**
+>
+> * "The questions are good. However, how will you get the data to answer them? Most of the data is information you wouldn’t have access to."
+> * (Paraphrased) - It might be hard to get access to data you need especially because federal law is so strict about the privacy of student academic records.
+:::
+</div>
+
+
+<!-- Professional (2) -->
+<!-- [PAUL CANNON] -->
+<div style="background-color: rgba(0, 0, 001, .02);">
+> ##### 2) **Paul Cannon, MS**
+*Professor of Statistics at BYU–Idaho*
+>
+> ::: {.callout-note collapse="true"}
+###### Feedback
+> [Faculty Profile](https://www.byui.edu/mathematics/paul-cannon) or [LinkedIn](https://www.linkedin.com/in/paul-cannon-b676419/)
+>
+> ---
+>
+> **General**
+> 
+> * These are interesting questions but a lot of the time the real constraint is getting access to the data.
+> * You could go find an interesting data set on Google's [Dataset Search](https://datasetsearch.research.google.com) tool and use that dataset to guide the question you choose to research and answer.
+> * This assignment was meant to get you thinking (*W02 - Task 2*) not have you entirely figure out a definitive project idea.
+:::
+</div>
+
+
+<!-- Professional (3) -->
+<!-- [] -->
+<div style="background-color: rgba(0, 0, 001, .02);">
+> ##### 3) **John Chapman, PhD, MBA**
+*Professor of Marketing, Operations, and Supply Chain Management at BYU–Idaho*
+>
+> ::: {.callout-note collapse="true"}
+###### Feedback
+> [Faculty Profile](https://www.byui.edu/finance/john-chapman) or [LinkedIn](https://www.linkedin.com/in/chapmjs/)
+>
+> ---
+>
+> **Institutional Research & Assessment**
+> 
+> * BYU-Idaho has a team that answers questions at the behest of university administration. Perhaps you could reach out to leaders on that team to ask if you could get access to some university/student data for analysis.
+:::
+</div>
+
+</BR>
+
+
+
+
+
+<!-- ------------- -->
+<!--      PEERS    -->
+<!-- ------------- -->
+
+#### **Peer Feedback**
+<!-- Get feedback from three to four other people on their interest in your questions. -->
+
+
+<!-- Peer (1) -->
+<!-- [SIGMUIND SERRANILLA] -->
+<div style="background-color: rgba(0, 0, 001, .02);">
+> ###### 1) **Sigmund Serranilla, BS, Data Science**
+*VSG Module Engineer at Intel*
+>
+> ::: {.callout-note collapse="true"}
+###### Feedback
+> [LinkedIn](https://www.linkedin.com/in/sigmund-serranilla/)
+>
+> ---
+>
+> **Q1: Crossroads**
+> 
+> * "I like number 1. It will be more manual entry and observation. You’ll have to stand by the crossroads and actually count. And also, you’d have to track during other hours (9am, 12pm, etc.). Really cool project but honestly very time intensive."
+> 
+> * "Another way is asking the BYUI people for permission on the revenue data. This is probably the best way to approach it. I don’t know who you would have to talk to for that."
+> 
+> * "Great data project."
+> 
+> **Q2: Pass/Fail**
+> 
+> * "Number 2 is very suggestive in my opinion. For a professor one year might seem like nothing from an outsider perspective but in reality, it might an expedited crash course of experience that equals to like 5 years."
+> 
+> **Q3: Salary**
+> 
+> * "Number 3 is an ok question. Just from my assumption it usually takes on average 8-9 semesters to complete a full bachelors degree, so roughly 4 years. But if you go every semester in BYUI’s trimester program you might shave off a year."
+> 
+> * "The question is broad and there are too many factors. I may suggest focusing on one industry and which degrees in that industry make the most based on length of school. Maybe the tech sector or the medical sector."
+:::
+</div>
+
+</BR>
+
+
+<!-- Peer (2) -->
+<!-- [TAYLOR EVERETT] -->
+<div style="background-color: rgba(0, 0, 001, .02);">
+> ##### 2) **Taylor Everett, BS, Business Analytics/Commerce**
+*Inventory Planner at Simplot Company*
+>
+> ::: {.callout-note collapse="true"}
+###### Feedback
+> [LinkedIn](https://www.linkedin.com/in/tayloraeverett/)
+>
+> ---
+> 
+> **General**
+> 
+> * "Hey Andrew, when I did this assignment what helped me most was thinking of how I was going to get the data. All of these are great options and ideas. However getting the data for these maybe pretty difficult."
+> 
+> **Q1: Crossroads**
+> 
+> * "If anything the crossroads option may be the better move if you’re looking to collect your own data. You could get try to calculate an average ticket for everything in the crossroads or maybe for one week during lunch you just track what people are checking out with and go from there."
+> 
+> **Q2-Q4: Pass/Fail, Salary, Temperature**
+> 
+> * "On the other ones if your able to get the data for the then they would be great options. However it may be hard to get that private information."
+:::
+</div>
+
+
+<!-- Peer (3) -->
+<!-- [PEER NAME] -->
+<!-- <div style="background-color: rgba(0, 0, 001, .02);"> -->
+<!-- > ##### 3) **[Name, Credentials]** -->
+<!-- *[Current Position]* -->
+<!-- > -->
+<!-- > ::: {.callout-note collapse="true"} -->
+<!-- ###### Feedback -->
+<!-- > [LinkedIn]() -->
+<!-- > -->
+<!-- > --- -->
+<!-- > -->
+<!-- > **General** -->
+<!-- >  -->
+<!-- > * -->
+<!-- > -->
+<!-- > **Q1: Crossroads** -->
+<!-- >  -->
+<!-- > *  -->
+<!-- > -->
+<!-- > **Q2: Pass/Fail** -->
+<!-- >  -->
+<!-- > *  -->
+<!-- > -->
+<!-- > **Q3: Salary** -->
+<!-- >  -->
+<!-- > * -->
+<!-- > -->
+<!-- > **Q4: Temperature** -->
+<!-- >  -->
+<!-- > *  -->
+<!-- ::: -->
+<!-- </div> -->
+
+
+<!-- Peer (4) -->
+<!-- [PEER NAME] -->
+<!-- <div style="background-color: rgba(0, 0, 001, .02);"> -->
+<!-- > ##### 4) **[Name]** -->
+<!-- *[Current Position]* -->
+<!-- > -->
+<!-- > ::: {.callout-note collapse="true"} -->
+<!-- ###### Feedback -->
+<!-- > [LinkedIn]() -->
+<!-- > -->
+<!-- > --- -->
+<!-- > -->
+<!-- > **General** -->
+<!-- >  -->
+<!-- > * -->
+<!-- > -->
+<!-- > **Q1: Crossroads** -->
+<!-- >  -->
+<!-- > *  -->
+<!-- > -->
+<!-- > **Q2: Pass/Fail** -->
+<!-- >  -->
+<!-- > *  -->
+<!-- > -->
+<!-- > **Q3: Salary** -->
+<!-- >  -->
+<!-- > * -->
+<!-- > -->
+<!-- > **Q4: Temperature** -->
+<!-- >  -->
+<!-- > *  -->
+<!-- ::: -->
+<!-- </div> -->
+
+
+
+
+
+## Synthesis
+
+1. This data could be requested or personally collected from the crossroads.
+2. This data would be very sensitive.
+3. This data would be very sensitive or require extensive online research.
+4. This data would be very sensitive however historical temperature data would be easy to access.
+
+
+
+
+
+<!-- =============== -->
+<!--     FILE END    -->
+<!-- =============== -->

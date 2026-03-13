@@ -9,8 +9,6 @@ output:
     toc: true
     toc_float: true
     code_folding: hide
-editor_options: 
-  chunk_output_type: console
 ---
 
 ## Setup {.tabset .tabset-pill .tabset-fade}

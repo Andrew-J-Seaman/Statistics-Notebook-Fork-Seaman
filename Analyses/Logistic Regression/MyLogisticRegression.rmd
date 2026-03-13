@@ -2,7 +2,7 @@
 title: "My Simple Logistic Regression"
 output: 
   html_document:
-    theme: cerulean
+    theme: flatly
     code_folding: hide
 ---
 
@@ -14,7 +14,147 @@ Hint, run the command
 
 in your Console to see available datasets in R that you could use for this Analysis. You are also welcome to collect data yourself, or find other available datasets online for this Analysis. Just be careful to not use anyone else's "analysis" for this Analysis. Also, no conducting surveys unless you have IRB approval to do so. -->
 
-```{r, include=FALSE}
+
+
+
+
+## Introduction {.tabset .tabset-fade}
+
+### Background
+
+### Setup
+
+#### Library Imports
+
+```{r libraries, class.source = 'fold-show', message=FALSE, warning=FALSE}
+# > Libraries
+library(tidyverse)
 library(mosaic)
-library(ResourceSelection) 
+library(car)
+library(pander)
+library(readr)          # > Used to import the data
+library(scales)         # > Needed? ChatGPT gave it to me when helping me write the big plotting function (jitter-box-line-plot 1 and 2)
+library(directlabels)
+#library(lubridate)     # > For date extraction in the 2nd plot of the Graphics section
 ```
+
+#### Data Import
+
+```{rdata, class.source = 'fold-show', message=FALSE, warning=FALSE}
+df = df
+```
+
+### Hide
+
+
+<!-- BREAK -->
+
+
+## Analysis
+
+### Hypotheses
+The hypotheses represent a binary state $(Y_i = \text{0 or 1})$. Stated as distinct hypothesis,
+
+$$
+H_0: Y_i = 0 \ (\neq 1)
+\\
+H_a: Y_i = 1 \ (\neq 0)
+$$
+
+
+#### Mathematical Formula
+
+$$
+  P(Y_i = 1|\, x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} = \pi_i
+$$
+
+
+
+
+### Tests
+
+# {.tabset .tabset-fade}
+
+## Tests
+
+We will preform the General Regression Model test (Glm).
+
+### Perform the Test
+```{r test_1}
+# Glm test
+```
+
+
+
+
+## Textbook 
+
+### Perform the test
+```{r txtbook_1, class.source = 'fold-show'}
+# myGlm <- glm(Y ~ X, data = NameOfYourDataset,
+#  family=binomial)
+# summary(YourGlmName)
+```
+
+### Diagnose the Goodness-of-Fit
+There are two ways to check the goodness of fit of a logistic regression model.
+
+**Option 1: Hosmer-Lemeshow Goodness-of-Fit Test (Most Common)**
+
+To check the goodness of fit of a logistic regression model where there are few or no replicated 𝑥
+-values use the Hosmer-Lemeshow Test.
+```{r txtbook_2, class.source = 'fold-show'}
+#library(ResourceSelection)
+#hoslem.test(YourGlmName$y, YourGlmName$fitted, g=10)
+```
+
+
+**Option 2: Deviance Goodness-of-fit Test (Less Common)**
+
+In some cases, there are many replicated 𝑥
+-values for all x-values, i.e., each value of x is repeated more than 50 times. Though this is rare, it is good to use the deviance goodness-of-fit test whenever this happens.
+```{r txtbook_3, class.source = 'fold-show'}
+#pchisq(residual deviance, df for residual deviance, lower.tail=FALSE)
+```
+
+
+### Plot the Regression
+
+**Option 2: ggplot**
+```{r txtbook_4, class.source = 'fold-show'}
+# ggplot(The ggplot(…) function is used to create a basic ggplot frame.data=YourDataSetName, aes(x=X,y=Y)) +
+#   geom_point() +
+#   geom_smooth(method=“glm”,method.args = list(family=“binomial”), se=FALSE) +
+#   theme_bw()
+```
+
+
+### Predict Probabilities
+
+To predict the probability that $Y_𝑖= 1$ for a given 𝑥-value, use the code
+```{r txtbook_5, class.source = 'fold-show'}
+# predict(YourGlmName, newdata = data.frame(xVariableName = someNumericValue), type = “response”)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

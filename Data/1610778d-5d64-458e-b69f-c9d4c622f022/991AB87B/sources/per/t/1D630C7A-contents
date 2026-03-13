@@ -1,0 +1,487 @@
+---
+title: "W02 - Task 1"
+subtitle: "DS350 - Bro. Cannon"
+author: "Andrew Seaman"
+date: "01-21-26"
+editor_options: 
+  chunk_output_type: console
+format:
+  html:
+    code-fold: true
+    code-tools: true
+---
+
+<!-- 
+╻┏┳┓┏━┓┏━┓┏━┓╺┳╸┏━┓
+┃┃┃┃┣━┛┃ ┃┣┳┛ ┃ ┗━┓
+╹╹ ╹╹  ┗━┛╹┗╸ ╹ ┗━┛
+-->
+
+<!-- Libraries and Data -->
+```{r libs-and-data, warning=FALSE, message=FALSE, echo=FALSE}
+# Libraries
+library(tidyverse)
+library(ggthemes)
+library(DT)
+library(palmerpenguins) # Data
+library(lvplot)
+library(nycflights13)
+# 
+# Attaching package: 'palmerpenguins'
+# The following objects are masked from 'package:datasets':
+# 
+#     penguins, penguins_raw
+```
+
+
+
+<!-- 
+╻┏┓╻╺┳╸┏━┓┏━┓╺┳┓╻ ╻┏━╸╺┳╸╻┏━┓┏┓╻
+┃┃┗┫ ┃ ┣┳┛┃ ┃ ┃┃┃ ┃┃   ┃ ┃┃ ┃┃┗┫
+╹╹ ╹ ╹ ╹┗╸┗━┛╺┻┛┗━┛┗━╸ ╹ ╹┗━┛╹ ╹
+-->
+
+## Introduction
+
+:::{.panel-tabset}
+
+### Show
+
+This page contain the student's reading notes for Week 2 Task 1. 
+
+**Readings:**
+
+1. [Chapter 1 Visualization: R for Data Science (2nd ed)](https://r4ds.hadley.nz/data-visualize)
+2. [Chapter 10 Exploratory Data Analysis: R for Data Science (2nd ed)](https://r4ds.hadley.nz/EDA.html)
+3. [Plotting large datasets](https://byuistats.github.io/M335/online_class/week2-ggplot.html#1)
+4. [ggplot cheatsheet](https://rstudio.github.io/cheatsheets/data-visualization.pdf)
+
+### Hide
+
+:::
+
+
+
+<!-- 
+╺┳┓┏━┓╺┳╸┏━┓
+ ┃┃┣━┫ ┃ ┣━┫
+╺┻┛╹ ╹ ╹ ╹ ╹
+-->
+
+## Data
+
+:::{.panel-tabset}
+
+## Show
+Let's get a look at the data.
+
+```{r}
+# View the data
+datatable(
+  penguins,
+  options = list(
+    pageLength = 5,
+    lengthMenu = c(5, 30, nrow(penguins))
+  )
+)
+```
+
+## Hide
+
+:::
+
+
+
+## Readings
+
+:::{.panel-tabset}
+
+<!--
+Reading 1.1
+┏━╸╻ ╻    ╺┓ 
+┃  ┣━┫     ┃ 
+┗━╸╹ ╹╹   ╺┻╸
+-->
+
+<!-- Tabset Header -->
+# Chapter 1
+
+<!-- Display Header -->
+## [Chapter 1: Data visualization](https://r4ds.hadley.nz/data-visualize)
+
+### 1.2.2 - 1.2.4
+
+<!-- Plot 1 -->
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point(aes(color = species, shape = species)) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Body mass and flipper length",
+    subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Flipper length (mm)", y = "Body mass (g)",
+    color = "Species", shape = "Species"
+  ) +
+  scale_color_colorblind()
+```
+
+### 1.4.3
+
+<!-- Plot 2 & 3: -->
+```{r}
+ggplot(penguins, aes(x = species)) +
+  geom_bar(color = "red")
+
+ggplot(penguins, aes(x = species)) +
+  geom_bar(fill = "red")
+```
+
+### 1.5.1 
+
+Example: side-by-side box plots.
+```{r}
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+```
+
+Example: overlayed density plots
+```{r}
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(alpha = 0.5)
+```
+
+### 1.5.2
+
+**Stacked Bar Charts**
+
+Frequency Plot:
+```{r}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+```
+
+Relative Frequency Plot:
+```{r}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill") +
+  labs(y = "proportion")
+```
+
+### 1.5.4
+
+To plot three of more variables we can map additional variables to different aesthetics such as color (species) and shape (island).
+```{r}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+```
+
+Or use facets:
+```{r}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = species)) +
+  facet_wrap(~island)
+```
+
+
+## Data and Visualization Summary
+
+**A numerical and a categorical variable:** 
+
+* Side-by-Side Box Plot
+* Histogram
+* Density Curves
+
+**Two categorical variables:**
+
+* Stacked Bar Chart:
+    a. Frequency Plot
+    b. Relative Frequency Plot
+
+**Two numerical variables:**
+
+* Scatterplot
+
+**Three of more variables:**
+
+* Scatterplot + mapping additional variables to different aesthetics (shape, color, etc.)
+* Faceting your plots
+
+
+
+
+
+<!--
+Reading 1.2
+┏━╸╻ ╻    ╺┓ ┏━┓
+┃  ┣━┫     ┃ ┃┃┃
+┗━╸╹ ╹╹   ╺┻╸┗━┛
+-->
+
+<!-- Tabset Header -->
+# Chapter 10
+
+<!-- Display Header -->
+## [Chapter 10: Exploratory data analysis (EDA)](https://r4ds.hadley.nz/EDA.html)
+
+### 10.2
+
+Two types of questions will always be useful for making discoveries within your data. You can loosely word these questions as:
+
+1. What type of variation occurs within my variables?
+2. What type of covariation occurs between my variables?
+
+### 10.4
+
+Take this plot as an example of a worthwhile comparison but yet unproductive in showing the comparison as clearly as we need.
+```{r}
+ nyc_cancelled <- nycflights13::flights |> 
+  mutate(
+    cancelled = is.na(dep_time),
+    sched_hour = sched_dep_time %/% 100,
+    sched_min = sched_dep_time %% 100,
+    sched_dep_time = sched_hour + (sched_min / 60)
+  )
+
+fp_plot <- 
+  ggplot(nyc_cancelled, aes(x = sched_dep_time)) + 
+  geom_freqpoly(aes(color = cancelled), binwidth = 1/4)
+
+fp_plot
+```
+
+Use the code above but facet the plots so each line can fully breathe unrestricted by the y-axis of the other.
+```{r}
+fp_plot +
+  facet_grid(rows = nyc_cancelled$cancelled, scales = "free_y") +
+  labs(
+    title = "Does cancellation affect scheduled departure times? Seems not.",
+    y = "Frequency",
+    x = "Scheduled Departure Time (hrs)",
+    color = "Cancelled"
+  ) 
+```
+
+### 10.5 
+
+Definitions:
+
+* **Variation:** describes the behavior within a variable.
+* **Covariation:** describes the behavior between variables. 
+
+#### 10.5.1.1
+
+One problem with boxplots is that they were developed in an era of much smaller datasets and tend to display a prohibitively large number of “outlying values”. One approach to remedy this problem is the letter value plot. Install the `lvplot` package, and try using `geom_lv()` to display the distribution of price vs. cut. What do you learn? How do you interpret the plots?
+```{r}
+ggplot(diamonds, aes(x = cut, y = price, color = cut)) +
+  geom_lv()
+```
+
+Create a visualization of diamond prices vs. a categorical variable from the diamonds dataset using geom_violin(), then a faceted geom_histogram(), then a colored geom_freqpoly(), and then a colored geom_density(). Compare and contrast the four plots. What are the pros and cons of each method of visualizing the distribution of a numerical variable based on the levels of a categorical variable?
+
+```{r}
+# Base plot
+p <- ggplot(diamonds, aes(x = price)) +
+  scale_x_continuous(labels = scales::comma) +
+  theme_bw()
+  
+# Violin Plot
+p + 
+  geom_violin(aes(y = clarity))
+
+# Faceted Histogram Plot
+p +
+  geom_histogram(binwidth = 500) +
+  # facet_grid(rows = vars(clarity), scales = "free", space = "fixed")
+  facet_wrap(nrow = 8, ncol = 2, facets = ~clarity, scales = "free")
+
+# Colored Frequency Polygon Plot
+p +
+  geom_freqpoly(binwidth = 200, color = "forestgreen")
+  
+
+```
+ 
+### 10.5.3
+
+```{r}
+# Small data set
+smaller <- diamonds |> 
+  filter(carat < 3)
+
+# Plot 1: standard bins
+ggplot(smaller, aes(x = carat, y = price)) +
+  geom_bin2d()
+
+# Plot 2: hexagonal bins
+ggplot(smaller, aes(x = carat, y = price)) +
+  geom_hex()
+```
+
+
+
+
+
+<!--
+Reading 1.3
+┏━┓╻  ┏━┓╺┳╸╺┳╸╻┏┓╻┏━╸   ╻  ┏━┓┏━┓┏━╸┏━╸   ╺┳┓┏━┓╺┳╸┏━┓┏━┓┏━╸╺┳╸┏━┓
+┣━┛┃  ┃ ┃ ┃  ┃ ┃┃┗┫┃╺┓   ┃  ┣━┫┣┳┛┃╺┓┣╸     ┃┃┣━┫ ┃ ┣━┫┗━┓┣╸  ┃ ┗━┓
+╹  ┗━╸┗━┛ ╹  ╹ ╹╹ ╹┗━┛   ┗━╸╹ ╹╹┗╸┗━┛┗━╸   ╺┻┛╹ ╹ ╹ ╹ ╹┗━┛┗━╸ ╹ ┗━┛
+-->
+
+<!-- Tabset Header -->
+# Plotting Large Datasets
+
+<!-- Display Header -->
+## Plotting Large Datasets
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+library(ggbeeswarm)
+```
+
+Let's look the count of flights by carrier.
+```{r}
+ggplot(data = flights) +
+  aes(x= fct_infreq(carrier)) +
+  geom_bar()
+```
+
+Let's look at departure delay.
+```{r}
+ggplot(data = flights,
+       aes(x = dep_delay)) +
+  geom_histogram(color = "white")
+```
+
+Apply a square root transform to see where the bulk of the data sits.
+```{r}
+ggplot(data = flights,
+       aes(x = dep_delay)) +
+  geom_histogram(color = "white") +
+  scale_x_continuous(trans = "sqrt")
+  #scale_x_sqrt() #ROTATE  #scale_x_sqrt()
+```
+
+Zooming in on the data using scale limits is not preferred as it eliminates data from possible future calculations.
+```{r}
+ggplot(data = flights,
+       aes(x = dep_delay)) +
+  geom_histogram() +
+  scale_x_continuous(
+    limits = c(-50, 250))
+```
+
+The preferred approach is adjust the coordinate layer.
+```{r}
+ggplot(data = flights,
+       aes(x = dep_delay)) +
+  geom_histogram(
+    color = "white",
+    binwidth = 10
+                 ) +
+  coord_cartesian(
+    xlim = c(-25, 250))
+```
+
+Let's build a boxplot.
+```{r}
+ggplot(data = flights) +
+  aes(x = fct_reorder(carrier, dep_delay, na.rm = TRUE)) +
+  aes(y = dep_delay) +
+geom_boxplot()
+```
+
+Let's try zooming in again but this time on a boxplot when the boxplots might be squished as above.
+```{r}
+ggplot(data = flights) +
+  aes(x = fct_reorder(carrier, dep_delay, na.rm = TRUE)) +
+  aes(y = dep_delay) +
+ geom_boxplot() +
+  coord_cartesian(ylim = c(-50,250))
+```
+
+Or we can do a violin plot.
+```{r}
+ggplot(data = flights,
+       aes(x = fct_reorder(carrier, dep_delay),
+           y = dep_delay)) +
+  geom_violin() +
+  coord_cartesian(ylim = c(-50, 250))
+```
+
+Using the Iris dataset let's compare the boxplot, violin plot, and the bee swarm plot.
+```{r}
+# Base Plot
+p <- ggplot(data = iris, aes(x = Species, y = Petal.Length))
+
+# Boxplot
+p +
+  geom_boxplot()  
+
+# Violin Plot
+p +
+  geom_violin()
+  
+# Bee Swarm Plot
+p +
+  geom_beeswarm()
+
+# Quasi-random Plot
+p +
+  geom_quasirandom()
+```
+
+Let's do the same thing but with a reduced set of the Flights dataset.
+```{r}
+p <- flights %>% sample_n(size=1000) %>%
+      ggplot(aes(x = carrier,y = dep_delay))
+
+# Boxplot
+p +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(-50, 500))
+
+# Violin Plot 
+p +
+  geom_violin() +
+  coord_cartesian(ylim = c(-50, 500))
+  
+# Bee Swarm Plot
+p +
+  geom_beeswarm(cex = .15) +
+  coord_cartesian(ylim = c(-50, 500))
+
+# Quasi-random Plot
+p +
+  geom_quasirandom() +
+  coord_cartesian(ylim = c(-50, 500))
+```
+
+
+
+
+
+<!-- 
+Reading 1.4
+┏━╸┏━╸┏━┓╻  ┏━┓╺┳╸   ┏━╸╻ ╻┏━╸┏━┓╺┳╸┏━┓╻ ╻┏━╸┏━╸╺┳╸
+┃╺┓┃╺┓┣━┛┃  ┃ ┃ ┃    ┃  ┣━┫┣╸ ┣━┫ ┃ ┗━┓┣━┫┣╸ ┣╸  ┃ 
+┗━┛┗━┛╹  ┗━╸┗━┛ ╹    ┗━╸╹ ╹┗━╸╹ ╹ ╹ ┗━┛╹ ╹┗━╸┗━╸ ╹ 
+-->
+
+<!-- Tabset Header -->
+# ggplot CheatSheet
+
+<!-- Display Header -->
+## ggplot cheatsheet
+
+I don't have any notes about this resource at the moment. I'm scanned it but will likely return to it later for deeper reference.
+
+:::
+
+
+
+
+
+<!-- END FILE -->

@@ -7,21 +7,15 @@ output:
   html_document:
     theme: journal
     code_folding: hide
-editor_options: 
-  chunk_output_type: console
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 # Load libraries. Modify list as needed.
-library(tidyverse)
+library(car)
 library(mosaic)
 library(mosaicData)
-library(DT)
 library(pander)
+library(tidyverse)
 ```
 
 
@@ -49,46 +43,23 @@ library(pander)
 
 <BR />
 
-### Questions [# of questions]
+### Questions
 
 ##### Q1
-\[summary]
+Linear Models - Plotting, Equations and Summary Interpretation
 
 ##### Q2
-\[summary]
+Asumptions of Linear Regression
 
 ##### Q3
-\[summary]
-
-##### Q4
-\[summary]
-
-##### Q5
-\[summary]
-
-##### Q6
-\[summary]
-
-##### Q7
-\[summary]
-
-##### Q8
-\[summary]
-
-##### Q9
-\[summary]
-
-##### Q10
-\[summary]
-
-<!-- END: Summary -->
+Perform linear regression test.
 
 
 
 
 
 <!-- START: Q1 -->
-## Q1
+## Q1 
 
 ----
 
@@ -96,63 +67,50 @@ library(pander)
 [Introduction text]
 
 ##### 1.1
+
+As explained in the help file (?SaratogaHouses), the SaratogaHouses data set contains data about many houses from Saratoga County, New York in the year 2006. Suppose a family is in search of a home that was 1) newly constructed and that has 2) three bedrooms. Suppose further that they are trying to decide how big of a livingArea they can afford and whether or not the price of the home is significantly impacted by adding a fireplace to their "dream home" wish list.
+
 ```{r}
 # 1.1
+palette(c("grey","firebrick"))
 
+SH2 <- filter(SaratogaHouses, bedrooms == 3,  newConstruction=="Yes") %>% 
+  mutate(fireplace = ifelse(fireplaces > 0, 1,0))
+
+plot(price ~ livingArea,
+     data = SH2,
+     col = as.factor(fireplace),
+     main = "Saratoga Houses - Ideal Home",
+     xlab = "Living Area",
+     ylab = "Price",
+     pch = 16)
+
+
+legend("topleft",
+       legend = c("No Fireplace","Fireplace"),
+       col = c("grey","firebrick"),
+       pch = 16,
+       bty = "n")
+
+mylm <- lm(price ~ livingArea + fireplace + livingArea:fireplace, data = SH2)
+summary(mylm) %>% pander()
+
+abline(mylm$coefficients["(Intercept)"], 
+       mylm$coefficients["livingArea"], col=palette()[1])
+
+abline(mylm$coefficients["(Intercept)"] + mylm$coefficients["fireplace"], 
+       mylm$coefficients["livingArea"] + mylm$coefficients["livingArea:fireplace"], col=palette()[2])
 ```
 
 ##### 1.2
+Let's diagnose the appropriateness of using a linear model for the data.
 ```{r}
 # 1.2
+par(mfrow=c(1,3))
 
-```
-
-##### 1.3
-```{r}
-# 1.3
-
-```
-
-##### 1.4
-```{r}
-# 1.4
-
-```
-
-##### 1.5
-```{r}
-# 1.5
-
-```
-
-##### 1.6
-```{r}
-# 1.6
-
-```
-
-##### 1.7
-```{r}
-# 1.7
-
-```
-
-##### 1.8
-```{r}
-# 1.8
-
-```
-
-##### 1.9
-```{r}
-# 1.9
-
-```
-
-##### 1.10
-```{r}
-# 1.10
-
+plot(mylm, which=1)
+qqPlot(mylm$residuals, id=FALSE)
+plot(mylm$residuals)
 ```
 
 <!-- END: Q1 -->
@@ -167,63 +125,85 @@ library(pander)
 ----
 
 ##### 2.1
+
 ```{r}
 # 2.1
+aq <- airquality
 
+plot(Temp ~ Month + I(Month^2), data = aq)
+
+mylm <- lm(Temp ~ Month + I(Month^2), data = aq)
+summary(mylm) %>% pander()
+
+par(mfrow=c(1,3))
+
+plot(mylm, which=1)
+qqPlot(mylm$residuals, id=FALSE)
+plot(mylm$residuals)
+
+par(mfrow = c(1,1)) #This resets your plotting window for future plots.
 ```
 
 ##### 2.2
 ```{r}
 # 2.2
+july_fourth = 7.129032
 
+mylm <- lm(Temp ~ Month + I(Month^2), data = aq)
+summary(mylm) %>% pander()
+# Estimate	Std. Error	t value	Pr(>|t|)
+# (Intercept)	-95.73	15.24	-6.281	3.458e-09
+# Month	48.72	4.489	10.85	1.29e-20
+# I(Month^2)	-3.283	0.3199	-10.26	4.737e-19
+
+temp_july_fourth <- 
+  (mylm$coefficients["(Intercept)"]) + 
+  (mylm$coefficients["Month"] * july_fourth) +
+  (july_fourth^2) * mylm$coefficients["I(Month^2)"]
+
+# The average temperature on July 4th.
+temp_july_fourth
 ```
 
 ##### 2.3
 ```{r}
 # 2.3
+plot(Temp ~ Month, data = aq, col="skyblue2", pch = 19, main = "airquality Data Set")
 
+curve(predict(mylm, data.frame(Month = x)), add=TRUE, col="skyblue2", lwd=2)
+
+lines(c(july_fourth, july_fourth), c(0, temp_july_fourth), lty=2, col="firebrick")
+
+lines(c(0, july_fourth), c(temp_july_fourth, temp_july_fourth), lty=2, col="firebrick")
+
+points(july_fourth, temp_july_fourth, cex=1.2, col="firebrick", pch = 19)
+
+text(july_fourth + .15, temp_july_fourth + .2 , "Predicted Temp", cex=0.5, pos=3)
 ```
 
 ##### 2.4
+This formula is how we identify the vertex of the quadratic line. It's not always meaningful but sometimes it is.
+
+$$
+\frac{-\beta_1}{2\cdot\beta_2}
+$$
+
+The x value of the vertex is:
 ```{r}
 # 2.4
-
+vertex_x <- -(mylm$coefficients["Month"]) / (2 * mylm$coefficients["I(Month^2)"])
+vertex_x
 ```
 
 ##### 2.5
+The y value of the vertex is:
 ```{r}
 # 2.5
-
-```
-
-##### 2.6
-```{r}
-# 2.6
-
-```
-
-##### 2.7
-```{r}
-# 2.7
-
-```
-
-##### 2.8
-```{r}
-# 2.8
-
-```
-
-##### 2.9
-```{r}
-# 2.9
-
-```
-
-##### 2.10
-```{r}
-# 2.10
-
+vertex_y <- 
+  (mylm$coefficients["(Intercept)"]) + 
+  (mylm$coefficients["Month"] * vertex_x +
+  (vertex_x^2) * mylm$coefficients["I(Month^2)"])
+vertex_y
 ```
 
 <!-- END: Q2 -->
@@ -235,42 +215,66 @@ library(pander)
 <!-- START: Q3 -->
 ## Q3
 
+It seems possible that the number of people on the trail on any particular day could be impacted by many things in this data set. Let's explore how the high temperature (hightemp) and whether or not it rains (this will be a new column we make) relates to the average number of users on the trail.
+
 ----
 
 ##### 3.1
 ```{r}
 # 3.1
-
+rt <- RailTrail %>% 
+  mutate(rain = ifelse(precip > 0, 1, 0))
 ```
 
 ##### 3.2
 ```{r}
 # 3.2
+palette(c("orange","skyblue"))
 
+plot(volume ~ hightemp, data=rt, col=as.factor(rain), main="RailTrail Data Set")
+
+legend("topleft", legend=c("No Rain", "Rain"), col=palette(), pch=16)
 ```
 
 ##### 3.3
+Only the estimate for `hightemp` was significant.
 ```{r}
 # 3.3
-
+mylm1 <- lm(volume ~ hightemp + rain + hightemp:rain, data = rt)
+summary(mylm1) %>% pander()
 ```
 
 ##### 3.4
+Let's remove the more complicated term `hightemp:rain` and see if the other terms are now significant.
 ```{r}
 # 3.4
-
+mylm2 <- lm(volume ~ hightemp + rain, data = rt)
+summary(mylm2) %>% pander()
 ```
 
 ##### 3.5
+Now let's plot a new graph.
 ```{r}
 # 3.5
+palette(c("orange","skyblue"))
+b <- coef(mylm2)
 
+  plot(volume ~ hightemp, data=rt, col=as.factor(rain), main="RailTrail Data Set")
+  legend("topleft", legend=c("No Rain", "Rain"), col=palette(), pch=16)
+  curve(b[1] + b[2]*x, add=TRUE, lwd=2, col="orange")
+  curve(b[1] + b[3] + b[2]*x, add=TRUE, lwd=2, col="skyblue")
 ```
 
 ##### 3.6
+Let's run the diagnostic plots to see if a linear regression model seems fitting for the data.
 ```{r}
 # 3.6
+par(mfrow=c(1,3))
+plot(mylm2,which=1)
+qqPlot(mylm2$residuals, id=FALSE)
+plot(mylm2$residuals)
 
+par(mfrow=c(1,1))
 ```
 
 ##### 3.7
@@ -311,31 +315,43 @@ library(pander)
 ##### 4.1
 ```{r}
 # 4.1
-
+?faithful
 ```
 
 ##### 4.2
+Perform a simple linear regression to determine if the expected waiting time to the next eruption can be modeled by the length of the previous eruption.
 ```{r}
 # 4.2
-
+mylm <- lm(waiting ~ eruptions, data = faithful)
+summary(mylm) %>% pander()
 ```
 
 ##### 4.3
 ```{r}
 # 4.3
-
+plot(waiting ~ eruptions, data = faithful)
+abline(mylm)
 ```
 
 ##### 4.4
 ```{r}
 # 4.4
+par(mfrow=c(1,2))
+plot(mylm, which=1:2)
 
+par(mfrow = c(1,1)) #This resets your plotting window for future plots.
 ```
 
 ##### 4.5
+If the erruption is 3.5 minutes we would expect the visitor to wait in minutes about:
 ```{r}
 # 4.5
+yint <-  33.47
+increase <- 10.73
+t = 3.5
 
+wait_time <- yint + (t * increase)
+wait_time
 ```
 
 ##### 4.6
@@ -373,434 +389,6 @@ library(pander)
 
 
 
-
-<!-- START: Q5 -->
-## Q5
-
-----
-
-##### 5.1
-```{r}
-# 5.1
-
-```
-
-##### 5.2
-```{r}
-# 5.2
-
-```
-
-##### 5.3
-```{r}
-# 5.3
-
-```
-
-##### 5.4
-```{r}
-# 5.4
-
-```
-
-##### 5.5
-```{r}
-# 5.5
-
-```
-
-##### 5.6
-```{r}
-# 5.6
-
-```
-
-##### 5.7
-```{r}
-# 5.7
-
-```
-
-##### 5.8
-```{r}
-# 5.8
-
-```
-
-##### 5.9
-```{r}
-# 5.9
-
-```
-
-##### 5.10
-```{r}
-# 5.10
-
-```
-
-<!-- END: Q5 -->
-
-
-
-
-
-<!-- START: Q6 -->
-## Q6
-
-----
-
-##### 6.1
-```{r}
-# 6.1
-
-```
-
-##### 6.2
-```{r}
-# 6.2
-
-```
-
-##### 6.3
-```{r}
-# 6.3
-
-```
-
-##### 6.4
-```{r}
-# 6.4
-
-```
-
-##### 6.5
-```{r}
-# 6.5
-
-```
-
-##### 6.6
-```{r}
-# 6.6
-
-```
-
-##### 6.7
-```{r}
-# 6.7
-
-```
-
-##### 6.8
-```{r}
-# 6.8
-
-```
-
-##### 6.9
-```{r}
-# 6.9
-
-```
-
-##### 6.10
-```{r}
-# 6.10
-
-```
-
-<!-- END: Q6 -->
-
-
-
-
-
-<!-- START: Q7 -->
-## Q7
-
-----
-
-##### 7.1
-```{r}
-# 7.1
-
-```
-
-##### 7.2
-```{r}
-# 7.2
-
-```
-
-##### 7.3
-```{r}
-# 7.3
-
-```
-
-##### 7.4
-```{r}
-# 7.4
-
-```
-
-##### 7.5
-```{r}
-# 7.5
-
-```
-
-##### 7.6
-```{r}
-# 7.6
-
-```
-
-##### 7.7
-```{r}
-# 7.7
-
-```
-
-##### 7.8
-```{r}
-# 7.8
-
-```
-
-##### 7.9
-```{r}
-# 7.9
-
-```
-
-##### 7.10
-```{r}
-# 7.10
-
-```
-
-<!-- END: Q7 -->
-
-
-
-
-
-<!-- START: Q8 -->
-## Q8
-
-----
-
-##### 8.1
-```{r}
-# 8.1
-
-```
-
-##### 8.2
-```{r}
-# 8.2
-
-```
-
-##### 8.3
-```{r}
-# 8.3
-
-```
-
-##### 8.4
-```{r}
-# 8.4
-
-```
-
-##### 8.5
-```{r}
-# 8.5
-
-```
-
-##### 8.6
-```{r}
-# 8.6
-
-```
-
-##### 8.7
-```{r}
-# 8.7
-
-```
-
-##### 8.8
-```{r}
-# 8.8
-
-```
-
-##### 8.9
-```{r}
-# 8.9
-
-```
-
-##### 8.10
-```{r}
-# 8.10
-
-```  
-
-<!-- END: Q8 -->
-
-
-
-
-
-<!-- START: Q9 -->
-## Q9
-
-----
-
-##### 9.1
-```{r}
-# 9.1
-
-```
-
-##### 9.2
-```{r}
-# 9.2
-
-```
-
-##### 9.3
-```{r}
-# 9.3
-
-```
-
-##### 9.4
-```{r}
-# 9.4
-
-```
-
-##### 9.5
-```{r}
-# 9.5
-
-```
-
-##### 9.6
-```{r}
-# 9.6
-
-```
-
-##### 9.7
-```{r}
-# 9.7
-
-```
-
-##### 9.8
-```{r}
-# 9.8
-
-```
-
-##### 9.9
-```{r}
-# 9.9
-
-```
-
-##### 9.10
-```{r}
-# 9.10
-
-``` 
-
-<!-- END: Q9 -->
-
-
-
-
-
-<!-- START: Q10 -->
-## Q10
-
-----
-
-##### 10.1
-```{r}
-# 10.1
-
-```
-
-##### 10.2
-```{r}
-# 10.2
-
-```
-
-##### 10.3
-```{r}
-# 10.3
-
-```
-
-##### 10.4
-```{r}
-# 10.4
-
-```
-
-##### 10.5
-```{r}
-# 10.5
-
-```
-
-##### 10.6
-```{r}
-# 10.6
-
-```
-
-##### 10.7
-```{r}
-# 10.7
-
-```
-
-##### 10.8
-```{r}
-# 10.8
-
-```
-
-##### 10.9
-```{r}
-# 10.9
-
-```
-
-##### 10.10
-```{r}
-# 10.10
-
-```
-
-<!-- END: Q10 -->
-
-
-
-
-
-#
 
 <!-- END: Main Tabset -->
 

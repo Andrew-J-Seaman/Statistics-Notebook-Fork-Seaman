@@ -512,17 +512,20 @@ ggplot(HSS2, aes(
   theme(
     legend.position = "top",
     legend.justification = "left",
+    legend.text = element_text(face = "bold", size = 10),
+    legend.title = element_blank(),
     axis.title.x = element_text(hjust = 0.5),
     axis.title.y = element_text(hjust = 0.5),
-    axis.text.y = element_text(size = 8)
+    axis.text.y = element_text(size = 8),
+    plot.caption = element_text(face = "italic", size = 8, hjust = -.3, color = "grey40")
   ) +
   labs(
-    title = "Activity specific distributions show diverse means",
-    subtitle = "Exploratory plot: 1.5 - Ridgeplot (desc)",
+    # subtitle = "Memory challenge scores by favorite physical activity distribute differently",
+    title = "Density by Favorite Physical Activity for \nU.S. High School Seniors Surveyed",
+    subtitle = "Favorite physical activity by activity type show diverse means",
+    caption = "(Exploratory plot: 1.5)",
     y = "Favorite Physical Activity",
-    x = "Time taken on Memory Challenge",
-    fill = "Activity Group",
-    color = "Activity Group"
+    x = "Time taken on Memory Challenge"
   )
 ```
 
@@ -561,17 +564,22 @@ ggplot(HSS2, aes(x = memory, fill = activity_group, color = activity_group)) +
   theme(
     legend.position = "top",
     legend.justification = "left",
+    legend.text = element_text(face = "bold", size = 10),
+    legend.title = element_blank(),
     axis.title.x = element_text(hjust = 0.5),
     axis.title.y = element_text(hjust = 0.5),
-    plot.title = element_text(face = "bold")
+    plot.title = element_text(face = "bold"),
+    plot.title.position = "plot",
+    plot.caption = element_text(face = "italic", size = 8, hjust = .03, color = "grey40")
   )+
   labs(
-    title = "Aggregated by activity type the distributions show near equal means",
-    subtitle = "Exploratory plot: 1.8 - Density by Activity Group",
+    title = "Density by Preferred Physical Activity Group for \nU.S. High School Seniors Surveyed",
+    subtitle = "Prefered Activity Group show nearly identical means",
+    caption = "(Exploratory plot: 1.8)",
     x = "Time taken on Memory Challenge",
     y = "Density",
-    fill = "Activity Group",
-    color = "Activity Group"
+    fill = "Activity Group:",
+    color = "Activity Group:"
   )
 ```
 
@@ -596,7 +604,7 @@ pander(test_results)
 
 **Interpretation**
 
-Above we see the test statistic is about equal to a quarter of a single standard deviation (-0.2657) which means the means are very close to each other. With a p-value of 0.7906 ($\alpha = 0.10) we must fail to reject the null hypothesis. There simply isn't enough evidence the means are different from each other as influenced by an individuals preference of physical activity type.
+Above we see the test statistic is about equal to a quarter of a single standard deviation (-0.2657) which means the means are very close to each other. With a p-value of 0.7906 ($\alpha = 0.10$) we must fail to reject the null hypothesis. There simply isn't enough evidence the means are different from each other as influenced by an individuals preference of physical activity type.
 
 </BR>
 

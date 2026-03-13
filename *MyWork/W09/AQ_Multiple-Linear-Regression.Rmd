@@ -15,14 +15,9 @@ output:
 <!-- SETUP: -->
 <!-- ------ -->
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 # Load libraries
 library(mosaic)
-library(DT)
 library(pander)
 library(tidyverse)
 ```
@@ -49,17 +44,14 @@ library(tidyverse)
 
 ```{r}
 # a.
-
+kf2 <- KidsFeet %>% 
+  mutate(gender = ifelse(sex =="G", 1, 0))
 
 # b.
-
+mylm <- lm(length ~ width + gender + width:gender, data = kf2)
 
 # c.
-
-
-# d.
-
-
+summary(mylm)
 ```
 
 <!-- Q1. End -->
@@ -79,16 +71,19 @@ library(tidyverse)
 [Response]
 
 ```{r}
-# a.
-
-
+#a. 
+cars <- datasets::cars
 # b.
-
+cars2 <- cars %>% 
+  mutate()
 
 # c.
-
+mylm <- lm(dist ~ speed + I(speed^2), data=cars2)
 
 # d.
+summary(mylm) %>% pander()
+
+# e.
 
 
 ```

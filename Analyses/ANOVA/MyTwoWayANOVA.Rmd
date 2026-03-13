@@ -2,11 +2,13 @@
 title: "My Two-way ANOVA: Study Hours"
 subtitle: "W06 Analysis"
 author: "Andrew Seaman"
-date: "25-Oct-2025"
+date: "March 3rd, 2026"
 output: 
   html_document:
     theme: cerulean
     code_folding: hide
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- ————————————————————————————————————————————————————————————————————————
@@ -20,11 +22,6 @@ Studying reaction time is recommended because the data is quickly collected.
 While you should use the warpbreaks example analyses as your guide on how to properly complete this analysis, you should also be creative in your final delivery of this analysis. If you copy the format and approach of the example analyses, be sure to give credit in your document to these example analyses. You could write something like, "This work is modeled after the [warpbreaks](https://byuistats.github.io/Statistics-Notebook/Analyses/ANOVA/Examples/warpbreaksTwoWayANOVA.html) analysis." Whatever you do, DO NOT use any of the written statements from the example analyses in your analysis unless you quote them directly and give credit. Using someone else's writing as your own without giving credit to the original author is plagiarism and is an Honor Code Violation. So do your own work. Plus, the more you try to write things in your own words, the more you will learn. Also, note that there aren't really any "rules" about exactly how your document should be organized. So be creative and organize your file in a way that makes sense to you, but still has all important elements.
 
 ———————————————————————————————————————————————————————————————————————— -->
-
-<!-- Format HTML Rendering -->
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 <!-- Libraries -->
 ```{r, warning=FALSE, message=FALSE}
@@ -106,37 +103,58 @@ course_load <- source %>%
 
 pander(course_load, justify = c("left", "left", "center", "center"))
 ```
-_Note: it is recommended by the University to estimate weekly study hours for a course equal to "credit hours * (times) 3"._
+_(Note: it is recommended by the University to estimate weekly study hours for a course equal to "credit hours * (times) 3".)_
 
 The Student shared they began this project out of personal necessity to make his time management skill development visible so he could better approach learning how he used his time, when, and where. He added it was deeply insightful to glimpse even basic statistics as a result of his "personal study" however he is now interested in determining which factors may have had significant impact on the distribution of his time spent studying.
 
 <!-- End of the tabset (background) -->
+
+---
+
 ### Hide
 
-<BR />
+*Click the tabs to see more detail.*
 
-<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+---
 
-## Analysis {.tabset .tabset-fade}
+##
+
+</BR>
+
+
+
+
+
+## Analysis
 
 ### Hypotheses
 
-The data was recorded for each course per day per week meaning the day of the week (`Weekday`) as well as the course (`Course`) are interesting factors which may have had significant impact on the distribution of study hours. Due to this multi-factored interaction it is most appropriate to use a <u>two-way ANOVA</u> test to evaluate the influence of each factor separately and jointly.
+The data was recorded for each course per day per week meaning the day of the week (`Weekday`) as well as the course (`Course`) are interesting factors which may have had significant impact on the distribution of study hours. Due to this multi-factored interaction it is most appropriate to use a <u>two-way ANOVA</u> test to evaluate the influence of each factor separately as well as their interaction.
 
-#### Set 1: **Weekday** (One-way ANOVA)
-Hypotheses about Weekday where $\mu$ represents the mean number of hours studied outside of class time.
+<!-- State chosen alpha value -->
+$$
+\text{A significance level of} \ \alpha = 0.05 \ \text{will be used for this study.}
+$$
+
+
+> Set 1: **Weekday** (One-way ANOVA)
+
+Hypotheses about the impact `Weekday` has on $\mu$ which represents the mean number of hours studied outside of class time. Does the pattern of mean study hours across the days change or are they all equal?
 $$
 H_0:\ \mu_{\text{Mon}}=\mu_{\text{Tue}}=\cdots=\mu_{\text{Sun}}
 \\
-H_a:\ \text{not all } \mu_k \text{ are equal.}
+H_a:\ \text{not all } \mu_k \text{ are equal}
 $$
 
-#### Set 2: **Course:** (One-way ANOVA)
-Hypotheses about Course where $\mu$ represents the mean number of hours studied outside of class time.
+
+> Set 2: **Course:** (One-way ANOVA)
+
+Hypotheses about the impact `Course` has on $\mu$ which represents the mean number of hours studied outside of class time by course. Does the pattern of mean study hours across the courses change or are they all equal?
+
+$$
+H_0:\ \mu_{\text{ACCTG201}}=\mu_{\text{MATH101}}=\mu_{\text{CSE111}}=\mu_{\text{MKT275}}=\mu_{\text{MATH221D}} \\
+H_a:\ \text{not all } \mu_k \text{ are equal}
+$$
 
 <!-- Courses: ACCTG 201, CSE 111, MATH 101, MATH 221, MKT 275 -->
 
@@ -146,30 +164,25 @@ Hypotheses about Course where $\mu$ represents the mean number of hours studied 
 <!-- H_a:  \mu_\text{i} \ne \mu \space \text{for at least one i} \space \in \text{{1 = ACCTG 201, 2 = CSE 111, 3 = MATH 101, 4 = MATH 221, 5 = MKT 275}} -->
 <!-- $$ -->
 
-$$
-H_0:\ \mu_{\text{ACCTG201}}=\mu_{\text{MATH101}}=\mu_{\text{CSE111}}=\mu_{\text{MKT275}}=\mu_{\text{MATH221D}} \\
-H_a:\ \text{not all } \mu_k \text{ are equal.}
-$$
 
-#### Set 3: **Weekday:Course** (Two-way ANOVA)
-Hypotheses about the interaction of Weekday and Course.
+> Set 3: **Weekday:Course** (Two-way ANOVA)
+
+Hypotheses about the interaction of Weekday and Course. Does the pattern of mean study hours across the days of the week change depending on which course it is? Or does the pattern show low mean study hours for all courses on a specific day? Or does a certain course have consistently lower mean study hours each day of the week?
 $$
-H_0: \text{The effect of Weekday on Hours is the same for all levels of Course.} 
+H_0: \text{The effect of Weekday on Hours is the same for all levels of Course} 
 \\
-H_a: \text{The effect of Weekday on Hours is not the same for all levels of Course.}
+H_a: \text{The effect of Weekday on Hours is not the same for all levels of Course}
 $$
 
-A significance level of $\alpha$ = 0.05 will be used for this study.
+---
 
-<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+</BR> 
 
-<BR /> <BR /> <BR />
 
-### Two-way ANOVA
+
+
+
+### Two-way ANOVA Test
 
 We will analyze the hypothesized significance of the two factors by computing the following Two-way ANOVA test.
 
@@ -215,19 +228,17 @@ par(mfrow=c(1,2))
 plot(hours_aov, which=1:2, pch=16)
 ```
 
-<BR /> <BR /> <BR />
+</BR>
 
-<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+
+
 
 ### Graphics and Numerical Summaries {.tabset .tabset-fade}
 
 The three following graphics with accompanying numerical summaries visualize the test results against each set of hypotheses. 
 
-<div style="color:red;">Again, these results should be interpreted with caution.</div>
+<div style="color:red;"><strong>Disclaimer: </strong> These results should be interpreted with caution.</div>
 
 </BR>
 
@@ -305,7 +316,7 @@ favstats(Hours ~ Weekday, data = StudyHours) %>%
 
 Wednesday had both the highest mean (1.807 hrs) and the highest standard deviation (2.882), indicating it was not only the most studied day but also showed wide variation in study duration by the Student. In contrast, Saturday had the lowest mean (0.4446 hrs) and a low standard deviation (1.283), suggesting more consistently low study hours. The standard deviations reflect how the Student’s weekday study behavior varied more from week to week than it did on weekends.
 
-<BR /> <BR /> <BR />
+</BR>
 
 #### Course
 
@@ -316,7 +327,8 @@ xyplot(Hours ~ as.factor(Course_Code),
        type = c("p", "a"), # points and averages
        main = "Study Hours by Course",
        xlab = "Course",
-       ylab = "Number of Study Hours")
+       ylab = "Number of Study Hours"
+      )
 ```
 
 The plot displays individual study time per course, with MATH 101 and ACCTG 201 having the highest visible clusters of study hours. CSE 111 consistently shows the lowest study hour values with minimal spread.
@@ -340,12 +352,14 @@ favstats(Hours ~ Course_Code, data = StudyHours) %>%
 
 MATH 101 had the highest mean study time (1.557 hrs), followed by ACCTG 201 (1.288 hrs), suggesting those courses required or received more attention. CSE 111 had the lowest mean (0.366 hrs) and the smallest standard deviation (1.193), suggesting less time spent and more consistency in study habits. Larger standard deviations for MATH 101 and ACCTG 201 (2.425 and 2.363, respectively) indicate broader variability in how the Student approached those courses.
 
-<BR /> <BR /> <BR />
+</BR>
+
+
 
 #### Course:Weekday
 
 <!-- Chart (3) -->
-```{r}
+```{r cool_plot}
 # ————————————————————————————————————————————————————————————————————————
 # DISCLOSURE: 
 
@@ -388,7 +402,7 @@ MATH 101 had the highest mean study time (1.557 hrs), followed by ACCTG 201 (1.2
 pal <- with(Color_Guide, setNames(Hex_Code, Course_Code))
 
 ggplot(StudyHours, aes(Weekday, Hours, group = Course_Code, color = Course_Code)) +
-  geom_jitter(width = 0.2, height = 0, pch = 21) +
+  geom_jitter(width = 0.2, height = 0, pch = 4, stroke = .7) +
   stat_summary(fun = "mean", geom = "line", linewidth = 0.7) +
   scale_color_manual(values = pal, name = "Course") +
   labs(
@@ -398,7 +412,10 @@ ggplot(StudyHours, aes(Weekday, Hours, group = Course_Code, color = Course_Code)
   ) +
   theme_bw() +
   theme(
-    legend.position = "top",
+    legend.position = c("top", "right"),
+    legend.justification = c(.97,.97),
+    legend.box.background = element_rect(color = "black"),
+    # legend.background = element_text(color = "black"),
     plot.title = element_text(face="bold", hjust = .5, size = 16),
     panel.grid.major.y = element_blank(),
     panel.grid.minor.y = element_blank()
@@ -455,13 +472,11 @@ pander(sdSummary_wide,
 
 The standard deviation table reveals substantial variation in study consistency across courses and weekdays. For instance, MKT 275 has a large standard deviation on Wednesday (3.57 hrs), reflecting high fluctuation in study time despite its high average. Similarly, ACCTG 201 and MATH 101 also show large standard deviations (3.18 and 3.28 hrs respectively) on Monday and Friday, suggesting that while these days may see higher study volumes, the duration varies widely. In contrast, CSE 111 consistently shows low standard deviations across all days, indicating steady but minimal study time regardless of the weekday. These differences highlight not only how much time is spent studying but also how reliably that time is spent from day to day within each course.
 
-<BR /> <BR /> <BR />
+</BR>
 
-<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+
+
 
 ### Conclusion
 
@@ -479,13 +494,11 @@ This means the data provides evidence that study hours differ not only by day of
 
 However, due to non-normal residuals and unequal variances, these results should be interpreted with caution. A non-parametric or transformation-based approach may offer more robust conclusions in future analyses.
 
-<BR /> <BR /> <BR />
+</BR>
 
-<!-- SECTION BREAK ———————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
-<!-- —————————————————————————————————————————————————————————————————————————————————————————— -->
+
+
+
 
 <!-- NOTE: this exploratory section is not very relevant to the primary aim of this analysis.
 

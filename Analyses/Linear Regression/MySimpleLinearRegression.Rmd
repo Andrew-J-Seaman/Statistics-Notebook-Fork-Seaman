@@ -470,7 +470,9 @@ plot(mylm,which=1:2)
 plot(mylm$residuals)
 ```
 
+**Summary**
 
+Overall, the diagnostic plots suggest the linear model captures the general relationship between heart rate and steps, as residuals are centered around zero. However, increasing spread in the residuals, deviations from normality, and several spikes indicate heteroskedasticity, outliers, and noise in the data. While the model provides a reasonable approximation, some regression assumptions are not fully satisfied.
 
 <!--———————————————————————————————————————————————————————————
 IDEAS
