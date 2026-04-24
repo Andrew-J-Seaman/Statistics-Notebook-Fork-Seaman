@@ -1,0 +1,441 @@
+---
+title: "Final"
+subtitle: "Intermediate Statistics (MATH325)"
+author: "Andrew Seaman"
+date: "2026/04/09"
+output: 
+  html_document:
+    theme: simplex
+    code_folding: hide
+    toc: true
+    toc_depth: 6
+    toc_float: true
+    collapsed: true
+    smooth_scroll: true
+---
+
+<!-- IMPORTS -->
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+#libraries
+pacman::p_load(mosaic, car, DT, pander, tidyverse)
+
+#data
+YoungAdults <- read_csv("https://raw.githubusercontent.com/saundersg/Statistics-Notebook/master/Data/YoungAdults.csv")
+adults <- YoungAdults
+```
+
+<!-- 
+
+ [1] "Gender"                     "Age"                        "Height"                     "Weight"                    
+ [5] "Number_of_siblings"         "Dominant_hand"              "Education"                  "Only_child"                
+ [9] "Fear_score"                 "Religiosity_score"          "Smoking"                    "Alcohol"                   
+[13] "I_live_a_healthy_lifestyle" "I_like_music"               "Music_diversity_score"      "Punctuality"  
+
+-->
+
+
+
+
+
+<!-- START: ALL -->
+# Pages
+
+
+
+
+
+<!-- START: Main Tabset -->
+# {.tabset .tabset-pills .tabset-fade}
+
+---
+
+**Return to:** 5
+
+**Review:** 9, 16, 19, 24
+
+**Resolved:** 5
+
+---
+
+**INCORRECT:** 13, 14, 15, 16, 17, 18, 20, 23, 25
+
+---
+
+<!-- START: Summary -->
+## Summary
+
+### Introduction
+[Introduction text]
+
+<BR />
+
+### Questions
+
+##### Q1
+\[summary]
+
+##### Q2
+\[summary]
+
+##### Q3
+\[summary]
+
+##### Q4
+\[summary]
+
+##### Q5
+\[summary]
+
+##### Q6
+\[summary]
+
+##### Q7
+\[summary]
+
+##### Q8
+\[summary]
+
+##### Q9
+\[summary]
+
+##### Q10
+\[summary]
+
+<!-- END: Summary -->
+
+
+
+
+
+<!-- START: Q1 -->
+## Q1
+*Answered*
+
+
+## Q2
+Simple Linear regression on YoungAdults
+```{r}
+# 1.1
+
+#lm
+weight.lm <- lm(Weight ~ Height, data = adults)
+
+#predict
+predict(weight.lm, data.frame(Height=183))
+
+
+#ANSWER: 76.3
+```
+
+
+## Q3
+*Answered*
+
+## Q4
+*Answered*
+
+## Q5
+
+```{r}
+#eval plot
+ggplot(adults, aes(x = Religiosity_score, y = Lying)) +
+  geom_point() +
+  geom_boxplot(alpha = .0)
+
+#filtered data
+df5 <- adults %>% 
+  mutate(
+    dummy_lying = ifelse(Lying == "never", 1, 0)
+  )
+
+myGlm <- glm(dummy_lying ~ Religiosity_score, data = df5, family = binomial)
+summary(myGlm) %>% pander()
+
+#ANSWER: p-value = 0.02283  (or rounded = 0.023)
+```
+
+## Q6
+Wilcoxon test. I think it's rank sum. I'm not sure.
+```{r}
+boxplot(Religiosity_score ~ Dominant_hand, data = adults)
+
+wilcox.test(Religiosity_score ~ Dominant_hand, data = adults)
+
+#ANSWER: p-value = 0.1307
+```
+
+## Q7
+Filter: 1) zero siblings, 2) never smoked, 3) never lie
+```{r}
+df7 <- adults %>% 
+  filter(
+    Number_of_siblings == 0,
+    Smoking == "never smoked",
+    Lying == "never"
+  )
+
+count(adults)
+count(df7)
+
+#ANSWER: 2 individuals
+```
+
+## Q8
+
+```{r}
+df8 <- adults %>% 
+  mutate(
+    BMI = Weight / ((Height / 100)^2)
+  )
+
+boxplot(BMI ~ Gender, data = df8)
+
+#ANSWER: 35
+```
+
+## Q9
+
+```{r}
+myAov <- aov(Fear_score ~ Only_child, data = adults)
+summary(myAov)
+
+boxplot(Fear_score ~ Only_child, data = adults)
+
+mean(adults$Fear_score)
+
+#ANSWER: mean_fear_score = 51.08317; p-value = 0.823 (or 0.824)
+```
+
+## Q10
+
+```{r}
+myAov <- aov(Religiosity_score ~ Alcohol, data = adults)
+summary(myAov)
+
+boxplot(Religiosity_score ~ Alcohol, data = adults)
+
+df10 <- adults %>% 
+  group_by(Alcohol) %>% 
+  summarise(mean_rlg_score = mean(Religiosity_score), na.rm = TRUE)
+
+
+#ANSWER: 
+#
+#   p-values = 3.16e-07
+#
+#   Mean r_scores:
+#     - drink a lot = 52.77477
+#     - never = 60.57258
+#     - social drinker = 58.23824
+
+```
+
+## Q11
+
+```{r}
+#new column
+df11 <- adults %>% 
+  mutate(
+    dummy_only_child = ifelse(Only_child == "yes", 1, 0)
+  )
+
+#logistic regression model
+myGlm <- glm(dummy_only_child ~ Number_of_siblings, data = df11, family=binomial)
+summary(myGlm) %>% pander()
+
+#predict probability
+predict(myGlm, newdata = data.frame(Number_of_siblings = 1), type="response")
+
+
+#plot
+ggplot(df11, aes(x=dummy_only_child,y=Number_of_siblings))+
+  geom_point()+
+  # > This code below did this equation:
+  # plot(Y ~ X, data=YourDataSet)
+  # curve(exp(𝑏0+𝑏1*x)/(1 + exp( 𝑏0+𝑏1*x)), add = TRUE)
+  # > "Just know, there is an equation actually graphing the line." - Bro. Saunders
+  geom_smooth(method="glm", method.args = list(family="binomial"), se = FALSE)+
+  theme_bw()+
+  labs(
+    title = "Siblings or Not",
+    subtitle = "Logistic Regression"
+  )+
+  coord_flip()
+
+#ANSWER: 0.2204748  or 22% (around 30%)
+```
+
+## Q12
+
+```{r}
+#contingency table
+lying_punc <- table(adults$Punctuality, adults$Lying)
+lying_punc %>% pander()
+
+#chi-squared test
+chis.lying_punc <- chisq.test(lying_punc)
+chis.lying_punc %>% pander()
+
+#expected values
+chis.lying_punc$expected %>% pander()
+
+#plot
+barplot(lying_punc, beside=TRUE, legend.text=TRUE, args.legend=list(x = "topleft", bty="n"))
+
+#ANSWER: 
+#
+#     Test statistic   df   P value 
+#    ---------------- ---- ---------
+#         8.549        6    0.2005  
+```
+
+## Q13
+
+```{r}
+YA2 <- adults %>% 
+  select(I_like_music, Music_diversity_score) %>% 
+  filter(I_like_music %in% c("Agree", "Disagree", "Neutral", "Strongly Agree", "Strongly Disagree")) %>% 
+  mutate(I_like_music = factor(I_like_music, levels = c("Agree", "Disagree", "Neutral", "Strongly Agree", "Strongly Disagree")), ordered = TRUE) %>% 
+  na.omit()
+
+#chart1
+# stripchart(I_like_music ~ Music_diversity_score, data = YA2)
+
+ggplot(YA2, aes(x = Music_diversity_score, y = I_like_music))+
+  geom_point()
+
+#ANSWER: You can run a logistic regression on this test. It wouldn't work as is. So you can't plot probabilities of one thing hapening or not.
+```
+
+## Q14
+
+```{r}
+YoungAdults.hwg <- adults %>% 
+  select(Height, Weight, Gender) %>% 
+  na.omit()
+
+ggplot(YoungAdults.hwg, aes(x = Height, y = Weight, color = Gender))+
+  geom_point()+
+  geom_smooth(method = "lm", se = F)
+  
+mylm <- lm(Height ~ Weight + Gender + Weight:Gender, data=YoungAdults.hwg)
+summary(mylm)
+
+#ANSWER: p-value: < 2.2e-16
+```
+
+## Q15
+*Answered*
+
+## Q16
+
+```{r}
+
+
+#ANSWER: 
+```
+
+## Q17
+*Answered*
+
+## Q18
+*Answered*
+
+## Q19
+*Answered*
+
+## Q20
+
+```{r}
+# #data
+# df20 <- adults %>% 
+#   filter(Number_of_siblings > 3)
+#   
+# #plot
+# plot(Religiosity_score ~ Fear_score, data = df20)
+# relig_vs_fear.lm <- lm(Religiosity_score ~ Fear_score, data = df20)
+# abline(relig_vs_fear.lm)
+# 
+# 
+# #permutation
+# N <- 2000
+# permutedTestStats <- rep(NA,N)
+# set.seed(121)
+# for(i in 1:N){
+#   permutedData <- sample(df20$Religiosity_score)
+#   permutedTest <- t.test(sample(Religiosity_score) ~ Fear_score, data = df20, my = 0)
+#   permutedTestStats[i] <- permutedTest$statistic
+# }
+# hist(permutedTestStats)
+# abline(v=observedTestStat)
+# sum(permutedTestStats >= observedTestStat)/N
+# sum(permutedTestStats <= observedTestStat)/N
+
+#ANSWER: The forth chart where the line always stays to the left of x = -2
+```
+
+## Q21
+*Answered*
+
+## Q22
+
+```{r}
+#data
+df22 <- adults %>% 
+  filter(
+    I_live_a_healthy_lifestyle == "Agree",
+    Gender == "male")
+  
+
+mean(df22$Weight, na.rm=TRUE)
+
+#ANSWER: 77.1 kg
+```
+
+## Q23
+Figure out which **non-parametric** test to run to get the correct p-value for this set of hypotheses:
+
+$$
+H_0 = \text{Each educational attainment is a sample from the same distribution of music diversity scores}
+\\
+H_a = \text{At least one educational attainment has stochastically higher or lower music diversity scores}
+$$
+
+I'm pretty sure it needs to be an ANOVA test.
+```{r}
+myAov <- aov(Music_diversity_score ~ Education, data = adults)
+summary(myAov)
+
+#ANSWER: p-value = 0.0415
+```
+
+## Q24
+*Answered*
+
+## Q25
+
+```{r}
+df20 <- adults %>% 
+  filter(I_like_music != "#NA", !is.na(Gender), !is.na(Punctuality)) %>% 
+  mutate(I_like_music = factor(I_like_music, levels=c("Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"), ordered = TRUE))
+
+ggplot(df20, aes(x = I_like_music, y = Happiness_score))+
+  geom_boxplot()+
+  facet_wrap(~Punctuality)+
+  coord_flip()
+
+#ANOVA
+# mytest <- lm(I_like_music ~ Happiness_score + Punctuality + Happiness_score:Punctuality, data = df20)
+# summary(mytest)
+
+#ANSWER: Linear Regression could be used to analyze this data...I'm pretty sure.
+```
+
+
+
+
+
+
+<!-- END: Main Tabset -->
+
+<!-- END: ALL -->

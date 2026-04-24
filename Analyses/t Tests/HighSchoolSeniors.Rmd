@@ -474,13 +474,13 @@ We'll state our hypotheses as,
 $$
 \\H_0: \ \mu_{Recreational} - \mu_{Structured} = 0
 \\H_a: \ \mu_{Recreational} - \mu_{Structured} \neq 0
-\\ \alpha = 0.1 \ \text{(10% CI)}
+\\ \alpha = 0.1 \ \text{(90% CI)}
 \\ \ 
 \\ \text{Or, stated more simply:}
 \\ \
 \\H_0: \ \mu_{Recreational} = \mu_{Structured}
 \\H_a: \ \mu_{Recreational} \neq \mu_{Structured}
-\\ \alpha = 0.1 \ \text{(10% CI)}
+\\ \alpha = 0.1 \ \text{(90% CI)}
 $$
 
 </BR>

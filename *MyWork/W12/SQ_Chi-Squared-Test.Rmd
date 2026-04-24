@@ -1,38 +1,24 @@
 ---
 title: "Chi Squared Test"
 subtitle: "Skills Quiz"
-author: "STUDENT NAME"
-date: "YYYY-MMM-DD"
+author: "Andrew Seaman"
+date: "2026-04-09"
 output: 
   html_document:
-    theme: journal
+    theme: simplex
     code_folding: hide
-editor_options: 
-  chunk_output_type: console
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
+<!-- IMPORTS -->
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-# Load libraries. Modify list as needed.
-library(tidyverse)
-library(mosaic)
-library(mosaicData)
-library(DT)
-library(pander)
+# Load libraries
+pacman::p_load(mosaic, DT, pander, tidyverse)
 ```
-
-
-<!-- START: ALL -->
-# Questions
-
-
-
-
 
 <!-- START: Main Tabset -->
+
+# Pages 
+
 # {.tabset .tabset-pills .tabset-fade}
 
 
@@ -40,22 +26,21 @@ library(pander)
 
 
 <!-- START: Summary -->
-## Summary
 
-----
+## Home
+
 
 ### Introduction
-[Introduction text]
+The focus of this Skills Quiz is to learn how to setup, perform, and interpret a Chi-Squared based analysis.
 
-<BR />
 
-### Questions [# of questions]
+### Questions 
 
 ##### Q1
-\[summary]
+Introduction and textbook study.
 
 ##### Q2
-\[summary]
+Fill in the blank.
 
 ##### Q3
 \[summary]
@@ -64,21 +49,6 @@ library(pander)
 \[summary]
 
 ##### Q5
-\[summary]
-
-##### Q6
-\[summary]
-
-##### Q7
-\[summary]
-
-##### Q8
-\[summary]
-
-##### Q9
-\[summary]
-
-##### Q10
 \[summary]
 
 <!-- END: Summary -->
@@ -90,70 +60,11 @@ library(pander)
 <!-- START: Q1 -->
 ## Q1
 
-----
-
-##### Introduction
-[Introduction text]
-
 ##### 1.1
-```{r}
-# 1.1
-
-```
-
-##### 1.2
-```{r}
-# 1.2
-
-```
-
-##### 1.3
-```{r}
-# 1.3
-
-```
-
-##### 1.4
-```{r}
-# 1.4
-
-```
-
-##### 1.5
-```{r}
-# 1.5
-
-```
-
-##### 1.6
-```{r}
-# 1.6
-
-```
-
-##### 1.7
-```{r}
-# 1.7
-
-```
-
-##### 1.8
-```{r}
-# 1.8
-
-```
-
-##### 1.9
-```{r}
-# 1.9
-
-```
-
-##### 1.10
-```{r}
-# 1.10
-
-```
+Mathematical model for a basic Chi-Squared test:
+$$
+\chi^2 = \sum_{i=1}^m \frac{(O_i - E_i)^2}{E_i}
+$$
 
 <!-- END: Q1 -->
 
@@ -164,67 +75,7 @@ library(pander)
 <!-- START: Q2 -->
 ## Q2
 
-----
-
-##### 2.1
-```{r}
-# 2.1
-
-```
-
-##### 2.2
-```{r}
-# 2.2
-
-```
-
-##### 2.3
-```{r}
-# 2.3
-
-```
-
-##### 2.4
-```{r}
-# 2.4
-
-```
-
-##### 2.5
-```{r}
-# 2.5
-
-```
-
-##### 2.6
-```{r}
-# 2.6
-
-```
-
-##### 2.7
-```{r}
-# 2.7
-
-```
-
-##### 2.8
-```{r}
-# 2.8
-
-```
-
-##### 2.9
-```{r}
-# 2.9
-
-```
-
-##### 2.10
-```{r}
-# 2.10
-
-```
+Fill in the blank.
 
 <!-- END: Q2 -->
 
@@ -235,66 +86,59 @@ library(pander)
 <!-- START: Q3 -->
 ## Q3
 
-----
-
 ##### 3.1
-```{r}
-# 3.1
 
+Run the following code in R. (This data is fabricated to mimic reality, but is not actual data.)
+ 
+```{r}
+# 3.1 
+
+# Table:
+
+#create
+glasses <- cbind( Males = c(Glasses = 5, Contacts = 12, None = 18), Females = c(Glasses = 4, Contacts = 14, None = 22))
+
+#view
+glasses %>% 
+
+#plot
+barplot(glasses, beside=TRUE, legend.text=TRUE, args.legend=list(x = "topleft", bty="n"))
 ```
 
 ##### 3.2
-```{r}
+Run the following code in R to determine if a chi-squared test of independence is appropriate for the glasses data.
+```{r, warning=FALSE}
 # 3.2
 
+#chi-squared test
+chis.glasses <- chisq.test(glasses)
+
+#expected values
+chis.glasses$expected %>% pander()
 ```
 
 ##### 3.3
+Which of the following statements are correct interpretations of the bar plot that the above code generated in R?
 ```{r}
 # 3.3
 
+mean(4.20000, 4.80000, 12.13333, 13.86667, 18.66667, 21.33333)
 ```
 
 ##### 3.4
+Run the following code in R to view the results of your test.
 ```{r}
 # 3.4
 
+chis.glasses %>% pander()
 ```
 
 ##### 3.5
+Test residuals:
 ```{r}
 # 3.5
 
-```
-
-##### 3.6
-```{r}
-# 3.6
-
-```
-
-##### 3.7
-```{r}
-# 3.7
-
-```
-
-##### 3.8
-```{r}
-# 3.8
-
-```
-
-##### 3.9
-```{r}
-# 3.9
-
-```
-
-##### 3.10
-```{r}
-# 3.10
-
+chis.glasses$residuals  %>% pander()
 ```
 
 <!-- END: Q3 -->
@@ -306,66 +150,41 @@ library(pander)
 <!-- START: Q4 -->
 ## Q4
 
-----
-
 ##### 4.1
+
+The following code gets this data into R.
+
 ```{r}
 # 4.1
 
+#build
+education <- cbind( `United States` = c(Engineering = 61941, `Natural Science` = 111158, `Social Science` = 182166), `Western Europe` = c(Engineering = 158931, `Natural Science` = 140126, `Social Science` = 116353), Asia = c(280772, 242879, 236018))
+
+#view
+education %>% pander()
 ```
 
 ##### 4.2
 ```{r}
 # 4.2
 
+#chi-squared test
+chis.education <- chisq.test(education)
+
+#view
+chis.education %>% pander()
+
+#plot
+barplot(education, beside=TRUE, legend.text=TRUE, args.legend=list(x = "topleft", bty="n"))
 ```
 
 ##### 4.3
+Pearson test residuals
 ```{r}
 # 4.3
 
-```
-
-##### 4.4
-```{r}
-# 4.4
-
-```
-
-##### 4.5
-```{r}
-# 4.5
-
-```
-
-##### 4.6
-```{r}
-# 4.6
-
-```
-
-##### 4.7
-```{r}
-# 4.7
-
-```
-
-##### 4.8
-```{r}
-# 4.8
-
-```
-
-##### 4.9
-```{r}
-# 4.9
-
-```
-
-##### 4.10
-```{r}
-# 4.10
-
+#residuals
+chis.education$residuals  %>% pander()
 ```
 
 <!-- END: Q4 -->
@@ -377,66 +196,43 @@ library(pander)
 <!-- START: Q5 -->
 ## Q5
 
-----
-
 ##### 5.1
+Consider the InsectSprays dataset in R. 
+
+\> ?InsectSprays
+
+Test the hypothesis that the mean number of bugs killed by insectisides A, B, C, D, E, and F are all the same against the alternative that at least one mean is different.
 ```{r}
 # 5.1
 
+#contingency table
+sprays <- table(InsectSprays$spray)
+sprays %>% pander()
+
+#chi-squared test
+chis.sprays <- chisq.test(sprays)
+chis.sprays %>% pander()
+
+#expected values
+chis.sprays$expected %>% pander()
 ```
 
 ##### 5.2
 ```{r}
 # 5.2
 
+#plot
+barplot(sprays, beside=TRUE, legend.text=TRUE, args.legend=list(x = "topleft", bty="n"))
 ```
 
 ##### 5.3
+Apparently I'm supposed to find the f-statistic for this test because ANOVA is a better fit for the data than chi-squared.
 ```{r}
 # 5.3
 
-```
-
-##### 5.4
-```{r}
-# 5.4
-
-```
-
-##### 5.5
-```{r}
-# 5.5
-
-```
-
-##### 5.6
-```{r}
-# 5.6
-
-```
-
-##### 5.7
-```{r}
-# 5.7
-
-```
-
-##### 5.8
-```{r}
-# 5.8
-
-```
-
-##### 5.9
-```{r}
-# 5.9
-
-```
-
-##### 5.10
-```{r}
-# 5.10
-
+#anova
+anova_model <- aov(count ~ spray, data = InsectSprays)
+summary(anova_model)
 ```
 
 <!-- END: Q5 -->
@@ -445,363 +241,10 @@ library(pander)
 
 
 
-<!-- START: Q6 -->
-## Q6
-
-----
-
-##### 6.1
-```{r}
-# 6.1
-
-```
-
-##### 6.2
-```{r}
-# 6.2
-
-```
-
-##### 6.3
-```{r}
-# 6.3
-
-```
-
-##### 6.4
-```{r}
-# 6.4
-
-```
-
-##### 6.5
-```{r}
-# 6.5
-
-```
-
-##### 6.6
-```{r}
-# 6.6
-
-```
-
-##### 6.7
-```{r}
-# 6.7
-
-```
-
-##### 6.8
-```{r}
-# 6.8
-
-```
-
-##### 6.9
-```{r}
-# 6.9
-
-```
-
-##### 6.10
-```{r}
-# 6.10
-
-```
-
-<!-- END: Q6 -->
-
-
-
-
-
-<!-- START: Q7 -->
-## Q7
-
-----
-
-##### 7.1
-```{r}
-# 7.1
-
-```
-
-##### 7.2
-```{r}
-# 7.2
-
-```
-
-##### 7.3
-```{r}
-# 7.3
-
-```
-
-##### 7.4
-```{r}
-# 7.4
-
-```
-
-##### 7.5
-```{r}
-# 7.5
-
-```
-
-##### 7.6
-```{r}
-# 7.6
-
-```
-
-##### 7.7
-```{r}
-# 7.7
-
-```
-
-##### 7.8
-```{r}
-# 7.8
-
-```
-
-##### 7.9
-```{r}
-# 7.9
-
-```
-
-##### 7.10
-```{r}
-# 7.10
-
-```
-
-<!-- END: Q7 -->
-
-
-
-
-
-<!-- START: Q8 -->
-## Q8
-
-----
-
-##### 8.1
-```{r}
-# 8.1
-
-```
-
-##### 8.2
-```{r}
-# 8.2
-
-```
-
-##### 8.3
-```{r}
-# 8.3
-
-```
-
-##### 8.4
-```{r}
-# 8.4
-
-```
-
-##### 8.5
-```{r}
-# 8.5
-
-```
-
-##### 8.6
-```{r}
-# 8.6
-
-```
-
-##### 8.7
-```{r}
-# 8.7
-
-```
-
-##### 8.8
-```{r}
-# 8.8
-
-```
-
-##### 8.9
-```{r}
-# 8.9
-
-```
-
-##### 8.10
-```{r}
-# 8.10
-
-```  
-
-<!-- END: Q8 -->
-
-
-
-
-
-<!-- START: Q9 -->
-## Q9
-
-----
-
-##### 9.1
-```{r}
-# 9.1
-
-```
-
-##### 9.2
-```{r}
-# 9.2
-
-```
-
-##### 9.3
-```{r}
-# 9.3
-
-```
-
-##### 9.4
-```{r}
-# 9.4
-
-```
-
-##### 9.5
-```{r}
-# 9.5
-
-```
-
-##### 9.6
-```{r}
-# 9.6
-
-```
-
-##### 9.7
-```{r}
-# 9.7
-
-```
-
-##### 9.8
-```{r}
-# 9.8
-
-```
-
-##### 9.9
-```{r}
-# 9.9
-
-```
-
-##### 9.10
-```{r}
-# 9.10
-
-``` 
-
-<!-- END: Q9 -->
-
-
-
-
-
-<!-- START: Q10 -->
-## Q10
-
-----
-
-##### 10.1
-```{r}
-# 10.1
-
-```
-
-##### 10.2
-```{r}
-# 10.2
-
-```
-
-##### 10.3
-```{r}
-# 10.3
-
-```
-
-##### 10.4
-```{r}
-# 10.4
-
-```
-
-##### 10.5
-```{r}
-# 10.5
-
-```
-
-##### 10.6
-```{r}
-# 10.6
-
-```
-
-##### 10.7
-```{r}
-# 10.7
-
-```
-
-##### 10.8
-```{r}
-# 10.8
-
-```
-
-##### 10.9
-```{r}
-# 10.9
-
-```
-
-##### 10.10
-```{r}
-# 10.10
-
-```
-
-<!-- END: Q10 -->
-
-
-
-
-
-#
-
 <!-- END: Main Tabset -->
+
+
+
+
 
 <!-- END: ALL -->

@@ -38,6 +38,8 @@ navbar:
           href: ./Analyses/Linear Regression/MyMultipleLinearRegression.html
         - text: "W10 - My Simple Logistic Regression"
           href: ./Analyses/Logistic Regression/MyLogisticRegression.html
+        - text: "W11 - Consulting Project"
+          href: ./Analyses/Consulting.html
         - text: "W12 - My Chi-sqaured Test"
           href: ./Analyses/Chi Squared Tests/MyChiSquaredTest.html
     - text: "Describing Data"

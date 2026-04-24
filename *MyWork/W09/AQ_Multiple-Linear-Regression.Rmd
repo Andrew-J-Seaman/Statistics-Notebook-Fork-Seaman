@@ -17,9 +17,7 @@ output:
 
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 # Load libraries
-library(mosaic)
-library(pander)
-library(tidyverse)
+pacman::p_load(DT, pander, mosaic, tidyverse)
 ```
 
 <!-- Setup End -->

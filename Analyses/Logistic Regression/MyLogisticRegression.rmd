@@ -4,6 +4,10 @@ output:
   html_document:
     theme: flatly
     code_folding: hide
+    toc: true
+    toc_float: true
+    toc_depth: 6
+    toc_fold: true
 ---
 
 <!-- Find some data of interest to you that can be analyzed with a logistic regression. Complete your Logistic Regression Analysis using this file. 
@@ -17,125 +21,373 @@ in your Console to see available datasets in R that you could use for this Analy
 
 
 
+</BR>
 
 ## Introduction {.tabset .tabset-fade}
 
-### Background
+### Description
+<!-- Explain the background of the data. -->
+Data on police treatment of individuals arrested in Toronto for simple possession of small quantities of marijuana. The data are part of a larger data set featured in a series of articles in the Toronto Star newspaper. Available are records from 1997-2002 (five years).
 
-### Setup
+</BR>
 
-#### Library Imports
+---
+
+### Imports
+
+Libraries and data used in this analysis. The data comes form a default *R dataset*.
 
 ```{r libraries, class.source = 'fold-show', message=FALSE, warning=FALSE}
-# > Libraries
-library(tidyverse)
-library(mosaic)
-library(car)
-library(pander)
-library(readr)          # > Used to import the data
-library(scales)         # > Needed? ChatGPT gave it to me when helping me write the big plotting function (jitter-box-line-plot 1 and 2)
-library(directlabels)
-#library(lubridate)     # > For date extraction in the 2nd plot of the Graphics section
+# Libraries
+pacman::p_load(mosaic, car, pander, readr, DT, scales, directlabels, ResourceSelection, tidyverse)
+
+
+# Data: Arrests for Marijuana Possession (R dataset).
+arrests = Arrests %>% 
+  rename(color = colour) %>% 
+  mutate(color_dummy = ifelse(color == "White", 0, 1))
 ```
 
-#### Data Import
+</BR>
 
-```{rdata, class.source = 'fold-show', message=FALSE, warning=FALSE}
-df = df
+---
+
+
+
+
+
+## Data
+
+The data features variables of event-driven facts and personally identifiable information (PII). We'll focus on the `color` of the arrested individual and the `year` of the arrest for this analysis.
+
+```{r}
+datatable(arrests)
 ```
 
-### Hide
+</BR>
+
+---
 
 
-<!-- BREAK -->
 
 
-## Analysis
 
-### Hypotheses
-The hypotheses represent a binary state $(Y_i = \text{0 or 1})$. Stated as distinct hypothesis,
+## Logistic Model
 
+For each arrest at least two variables—`colour` (or `color`) and `year`—are recorded. Let's assume crime rates continue at the same level for all populations observed. Is there any indication of possible racial discrimination demonstrated by a shift in the number of arrests of **black** versus **white** individuals in any year from 1997-2002 giving us five years to review. Essentially, did the police stop arresting one ethnicity (white) as much and start arresting the other (black) more.
+
+<span style="color:red;">Disclaimer</span>: Because the timeframe is so short it initially seems likely to the author a trend that could exist may not be indicated in this data.
+
+The model is predicting the <u>probability that an arrest is of a **black individual**</u>. It represents this in a binary state $(Y_i = \text{0 or 1})$ where black = 1 and white = 0.
+
+<!-- Mathematical model -->
 $$
-H_0: Y_i = 0 \ (\neq 1)
+  P(Y_i = 1|\, x_i) = \frac{e^{\beta_0 + \beta_1 x_i + \beta_2 x^2}}{1+e^{\beta_0 + \beta_1 x_i + \beta_2 x^2}} = \pi_i
+$$
+
+The hypotheses shows when $\beta_1 \ \text{&} \ \beta_2 = 0$ no relationship exists. In other words, the model is dead. We're testing the effect of the predictor (year) on that probability. Stated as distinct hypothesis,
+
+<!-- Hypotheses -->
+$$
+H_0: \beta_1, \beta_2 = 0
 \\
-H_a: Y_i = 1 \ (\neq 0)
+H_a: \beta_1, \beta_2 \neq 0
+\\ \alpha = 0.1 \ (\text{90% CI})
 $$
 
+</BR>
 
-#### Mathematical Formula
-
-$$
-  P(Y_i = 1|\, x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} = \pi_i
-$$
+---
 
 
 
 
-### Tests
 
-# {.tabset .tabset-fade}
+## Fitting the Model
 
-## Tests
+#### General Regression Model (*GLM*)
 
-We will preform the General Regression Model test (Glm).
+<!-- Disclaimer: copied this sentence from Brother Saunder's `Challenger` analysis. -->
+The estimates of the coefficients $\beta_0$ and $\beta_1$ for the above logistic regression model and data are shown below.
 
-### Perform the Test
+<!-- GLM Test -->
 ```{r test_1}
-# Glm test
+arr.glm <- glm(color_dummy ~ year + I(year^2), data = arrests, family=binomial)
+
+arr.glm.summ <- summary(arr.glm)
+pander(arr.glm.summ)
 ```
 
+</BR>
 
+#### Interpretation
 
+From the summary, the z-value (3.006) indicates the test statistic (189,137) is just more than three standard deviations away from the mean which is a huge. This is very statistically significant. This corresponds with a low p-value (0.002645), meaning there is a low probability of observing a test statistic this extreme (or more extreme) under the null hypothesis.
 
-## Textbook 
+Therefore, we have sufficient evidence and must <u>reject the null hypothesis</u>.
 
-### Perform the test
-```{r txtbook_1, class.source = 'fold-show'}
-# myGlm <- glm(Y ~ X, data = NameOfYourDataset,
-#  family=binomial)
-# summary(YourGlmName)
-```
+</BR>
 
-### Diagnose the Goodness-of-Fit
-There are two ways to check the goodness of fit of a logistic regression model.
+#### Testing Assumptions
 
-**Option 1: Hosmer-Lemeshow Goodness-of-Fit Test (Most Common)**
+In this case, the $x$-values (`year`) for all $x$-values ($n = 5226$) are sure to be replicated many times (>50) because $x$ can only be one of five values in a relatively large dataset. Therfore, we'll use the **Deviance Goodness-of-fit Test** (rare) which is used in this case as opposed to the *Hosmer-Lemeshow Goodness-of-Fit Test* (common) when $x$-values aren't replicated so much.
 
-To check the goodness of fit of a logistic regression model where there are few or no replicated 𝑥
--values use the Hosmer-Lemeshow Test.
-```{r txtbook_2, class.source = 'fold-show'}
-#library(ResourceSelection)
-#hoslem.test(YourGlmName$y, YourGlmName$fitted, g=10)
-```
-
-
-**Option 2: Deviance Goodness-of-fit Test (Less Common)**
-
-In some cases, there are many replicated 𝑥
--values for all x-values, i.e., each value of x is repeated more than 50 times. Though this is rare, it is good to use the deviance goodness-of-fit test whenever this happens.
-```{r txtbook_3, class.source = 'fold-show'}
+```{r}
 #pchisq(residual deviance, df for residual deviance, lower.tail=FALSE)
+pchisq_result <- pchisq(arr.glm.summ$deviance, arr.glm.summ$df.residual, lower.tail=FALSE) %>% pander()
 ```
 
+This shows evidence the quadratic logistic model I used is not a good fit for this data and I should be using a different type of model that is a good fit (`r pchisq_result` < $\alpha = 0.1$).
 
-### Plot the Regression
+</BR>
 
-**Option 2: ggplot**
-```{r txtbook_4, class.source = 'fold-show'}
-# ggplot(The ggplot(…) function is used to create a basic ggplot frame.data=YourDataSetName, aes(x=X,y=Y)) +
-#   geom_point() +
-#   geom_smooth(method=“glm”,method.args = list(family=“binomial”), se=FALSE) +
-#   theme_bw()
+---
+
+
+
+
+
+## Graphics
+
+The plot shows that black and white individuals were arrested in each year. It appears whites were more likely to be arrested over blacks until 2000 when the trend reversed and stabilized right near the starting probabilities in 1997.
+
+```{r}
+yint <- arr.glm.summ$coefficients[1]
+slope <- arr.glm.summ$coefficients[2]
+quad <- arr.glm.summ$coefficients[3]
+
+ggplot(arrests, aes(x = year, y = color_dummy)) +
+  geom_jitter(size = 1, alpha = .2, height = .4, width = .47) +
+  
+  # logistic curve
+  # 
+  # -- Corrections:
+  #   > 1. Renamed `estimate` variable to `yint`
+  #   > 2. Created `slope` variable
+  #   > 3. Flipped the `-` sign to a `+` sign.
+  # 
+  # -- version 2
+  stat_function(
+    fun = function(x) exp(yint + slope * x + quad* x^2) / (1 + exp(yint + slope * x + quad* x^2)),
+    linewidth = 1, color = "red"
+  ) +
+  
+  geom_smooth(color = "green", method = "loess")+ 
+  
+  # annotation
+  annotate(
+    "text",
+    x = 1997,
+    y = 0.5,
+    label = "The downward quadratic curve indicates fairly stable rates of change and likelihood YoY (0.23-0.30)",
+    hjust = 0,
+    size = 3,
+    color = "red"
+  ) +
+  
+  # horizontal lines
+  geom_hline(yintercept = c(0, 1), color = scales::alpha("black", 0.2)) +
+  
+  labs(
+    title = "Toronto's Marijuana Related Arrest Data from 1997 - 2002",
+    subtitle = "1 = Black person arrested",
+    x = "Year (Arrest)",
+    y = "Probability (Arrestee is Black)",
+    caption = "Figure 1."
+  ) +
+  theme_classic() +
+  
+  # scales
+  scale_x_continuous(breaks = c(1997,1998,1999, 2000, 2001, 2002))
 ```
 
+> Individual - Distinct Counts for Both Variables
 
-### Predict Probabilities
-
-To predict the probability that $Y_𝑖= 1$ for a given 𝑥-value, use the code
-```{r txtbook_5, class.source = 'fold-show'}
-# predict(YourGlmName, newdata = data.frame(xVariableName = someNumericValue), type = “response”)
+**Color (ethnicity)** </BR>
+The black population is only 25% of the total arrests.
+```{r}
+arrests %>%
+  count(color) %>%
+  mutate(pct = scales::percent(n / sum(n), accuracy = 1)) %>% 
+  pander()
 ```
 
+**Year (arrest)** </BR>
+Observe how many times the $x$-values (`year`) are replicated.
+```{r}
+arrests %>%
+  count(year) %>%
+  mutate(pct = scales::percent(n / sum(n), accuracy = 1)) %>%
+  pander()
+```
+
+</BR>
+
+<!-- PLOT: Black vs. White Representaiton by Year -->
+```{r}
+ggplot(arrests, aes(x = year, fill = color))+
+  geom_bar()+
+  scale_fill_manual(values = c("Black", "White"))+
+  # theme_dark()+
+  theme(
+    legend.position = "none"
+  )+
+  labs(
+    title = "Arrests of White People Triple Arrests of Black People",
+    subtitle = "Toronto, Canada - Simple possession of small quantities of marijuana",
+    x = "Year (Arrest)",
+    y = "Count (Arrests)",
+    caption = "Figure 2."
+  ) +
+  theme(
+    panel.background = element_rect(fill = "darkgreen"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_line(color = "white", linewidth = .2, linetype = "dotted"),
+    plot.title = element_text(size = 18),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  )+
+  scale_y_continuous(
+    breaks = seq(0, 1500, by = 250),
+    labels = scales::label_comma()
+  ) +
+  scale_x_continuous(breaks = c(1997, 1998, 1999, 2000, 2001, 2002))
+```
+
+The plot above shows on average white individuals are arrested ***x3*** as often as black individuals for all five years. It also shows both colors (ethnicities) were arrested each year. There was an observable increase from 1997 to 1998 in black individuals arrested but it levels off until 2002 where it drops for both colors (ethnicities).
+
+> Breakdown - Color (ethnicity) by year
+
+Here we see how many arrests were made each year by color (ethnicity).
+
+**Counts**
+<!-- Counts of color by year -->
+```{r}
+arrests %>%
+  count(year, color) %>%
+  pivot_wider(
+    names_from = year,
+    values_from = n
+  ) %>%
+  pander()
+```
+
+**Percentages**
+<!-- Percentage of color by year -->
+```{r}
+arrests %>%
+  count(year, color) %>%
+  group_by(year) %>%
+  mutate(pct = scales::percent(n / sum(n), accuracy = 1)) %>%
+  ungroup() %>%
+  select(year, color, pct) %>%
+  pivot_wider(
+    names_from = year,
+    values_from = pct
+  ) %>%
+  pander()
+```
+
+</BR>
+
+> Predicted Probabilities
+
+When we evaluate the probabilities at the $\text{high}_{\text{left}}$, $\text{low}_{\text{center}}$, and $\text{high}_{\text{right}}$ points on the curve in the first plot, we obtain:
+
+```{r}
+# a) Predict the probability that for a year (x=1997,2000,2002) a black person is to be arrested. 
+predicted_probability <- predict(arr.glm, newdata = data.frame(year=c(1997,2000,2002)), type="response")
+
+names(predicted_probability) <- c(1997,1999,2002) # Calculed the lower x-vertice with: -B1 / (2*B2)
+
+pander(as.data.frame(
+  predicted_probability),
+  caption = "Probability (high, low, high)")
+```
+
+This shows the probability across the years does not fluctuate more than .07 (7%) that Blacks will be arrested more than whites.
+
+
+
+
+
+
+
+</BR>
+
+---
+## Conclusion
+
+**New Conclusion**
+Because we rejected the null hypothesis two ideas come to mind: 
+
+1) Gather additional historical data spanning a longer time frame and find a better fitting model to illustrate the relationship between `year` and `color` (ethnicity). 
+2) Choose alternate variables to test such as `citizenship` against `year`. 
+
+Hypothetically, if a significant trend therein was discovered, I would suspect an influx in immigration to be culprit. Perhaps world events such as the September 11th terror attacks in the U.S. and the subsequent invasion of Iraq and Afghanistan — which displaced many people — led to a direct (or indirect) influx in immigration in Canada. Should this be the case, it could be a factor in the hypothetical surge in arrests made of non-citizens for the aforementioned offense.
+
+The data here are curious because of the multi-directional approach one can take interpreting it and the scope one can use to do so. It is recommended additional analysis of the data be attempted.
+
+
+
+
+
+<!-- End of page white space -->
+<!-- </BR></BR></BR></BR></BR> -->
+
+
+
+
+
+<!-- ## TEXTBOOK EXPLANATIONS  -->
+
+<!-- ### Perform the test -->
+<!-- ```{r txtbook_1, class.source = 'fold-show'} -->
+<!-- # myGlm <- glm(Y ~ X, data = NameOfYourDataset, -->
+<!-- #  family=binomial) -->
+<!-- # summary(YourGlmName) -->
+<!-- ``` -->
+
+<!-- ### Diagnose the Goodness-of-Fit -->
+<!-- There are two ways to check the goodness of fit of a logistic regression model. -->
+
+<!-- **Option 1: Hosmer-Lemeshow Goodness-of-Fit Test (Most Common)** -->
+
+<!-- To check the goodness of fit of a logistic regression model where there are few or no replicated 𝑥 -->
+<!-- -values use the Hosmer-Lemeshow Test. -->
+<!-- ```{r txtbook_2, class.source = 'fold-show'} -->
+<!-- #library(ResourceSelection) -->
+<!-- #hoslem.test(YourGlmName$y, YourGlmName$fitted, g=10) -->
+<!-- ``` -->
+
+
+<!-- **Option 2: Deviance Goodness-of-fit Test (Less Common)** -->
+
+<!-- In some cases, there are many replicated 𝑥 -->
+<!-- -values for all x-values, i.e., each value of x is repeated more than 50 times. Though this is rare, it is good to use the deviance goodness-of-fit test whenever this happens. -->
+<!-- ```{r txtbook_3, class.source = 'fold-show'} -->
+<!-- #pchisq(residual deviance, df for residual deviance, lower.tail=FALSE) -->
+<!-- ``` -->
+
+
+<!-- ### Plot the Regression -->
+
+<!-- **Option 2: ggplot** -->
+<!-- ```{r txtbook_4, class.source = 'fold-show'} -->
+<!-- # ggplot(The ggplot(…) function is used to create a basic ggplot frame.data=YourDataSetName, aes(x=X,y=Y)) + -->
+<!-- #   geom_point() + -->
+<!-- #   geom_smooth(method=“glm”,method.args = list(family=“binomial”), se=FALSE) + -->
+<!-- #   theme_bw() -->
+<!-- ``` -->
+
+
+<!-- ### Predict Probabilities -->
+
+<!-- To predict the probability that $Y_𝑖= 1$ for a given 𝑥-value, use the code -->
+<!-- ```{r txtbook_5, class.source = 'fold-show'} -->
+<!-- # predict(YourGlmName, newdata = data.frame(xVariableName = someNumericValue), type = “response”) -->
+<!-- ``` -->
 
 
 
@@ -147,14 +399,74 @@ To predict the probability that $Y_𝑖= 1$ for a given 𝑥-value, use the code
 
 
 
+<!-- ## EXPLORATION -->
+
+<!-- There appears to be an extremely strong relationshiop between `Citizenship` and `year` of arrest. -->
+
+<!-- ```{r} -->
+<!-- arr.ctzn.glm <- glm(citizen == "Yes" ~ year, data = arrests, family=binomial) -->
+
+<!-- arr.ctzn.glm.summ <- summary(arr.ctzn.glm) -->
+<!-- pander(arr.ctzn.glm.summ) -->
+
+<!-- arrests %>% count(citizen) -->
+<!-- ``` -->
+
+<!-- There appears to be an extremely strong relationshiop between `Citizenship` and `year` of arrest. -->
+
+<!-- ```{r} -->
+<!-- # GLM test -->
+<!-- arr.col.ctzn.glm <- glm(color_dummy ~ citizen, data = arrests, family=binomial) -->
+
+<!-- # Summary object -->
+<!-- arr.col.ctzn.glm.summ <- summary(arr.col.ctzn.glm) -->
+<!-- pander(arr.col.ctzn.glm.summ) -->
+
+<!-- # Counts of unique values -->
+<!-- arrests %>% count(color) -->
+<!-- arrests %>% count(citizen) -->
+<!-- ``` -->
+
+
+<!-- I just wanted to get a table showing how many blacks/whites per year were arrested. It didn't exactly work. -->
+<!-- ```{r} -->
+<!-- # Step 1 -  Make both look the same -->
+<!-- color_tbl <- arrests %>% -->
+<!--   count(color) %>% -->
+<!--   rename(value = color) %>% -->
+<!--   mutate( -->
+<!--     value = as.character(value), -->
+<!--     type = "color" -->
+<!--   ) -->
+
+<!-- year_tbl <- arrests %>% -->
+<!--   count(year) %>% -->
+<!--   rename(value = year) %>% -->
+<!--   mutate( -->
+<!--     value = as.character(value), -->
+<!--     type = "year" -->
+<!--   ) -->
+
+<!-- # Step 2 - Add a label so you know what’s what -->
+<!-- color_tbl <- color_tbl %>% mutate(type = "color") -->
+<!-- year_tbl  <- year_tbl  %>% mutate(type = "year") -->
+
+<!-- # Step 3 - Bind them -->
+<!-- combined <- bind_rows(color_tbl, year_tbl) -->
+<!-- combined %>% pander() -->
+<!-- ``` -->
 
 
 
 
 
+<!-- End of page white space -->
+<!-- </BR></BR></BR></BR></BR> -->
 
 
 
 
 
-
+<!-- ==================== -->
+<!--       FILE END       -->
+<!-- ==================== -->

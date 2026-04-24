@@ -9,21 +9,19 @@ output:
     toc: true
     toc_float: true
     code_folding: hide
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- ------ -->
 <!-- SETUP: -->
 <!-- ------ -->
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 # Load libraries
 library(mosaic)
-library(DT)
 library(pander)
+library(ResourceSelection)
 library(tidyverse)
 ```
 
@@ -43,24 +41,48 @@ library(tidyverse)
 <!-- ---------- -->
 
 ## 1.
-> _[Question]_
 
-[Response]
+Use an appropriate test to determine if the `birth weight` in ounces of a baby (wt) can be used to predict the probability that the `mother smoked` at all (smoke>0, or, if your Gestation data set has words in the "smoke" column, use smoke!="never") during or prior to the pregnancy. The graphic of the correct analysis is shown below.
 
 ```{r}
 # a.
-
+ges.glm <- glm( (smoke != "never") ~ wt, data = Gestation, family = binomial)
 
 # b.
-
+summary(ges.glm)
 
 # c.
-
+b <- coef(ges.glm)
 
 # d.
-
+plot( (smoke != "never") ~ wt, data = Gestation)
+curve( exp(b[1] + b[2]*x)/(1 + exp(b[1] + b[2]*x)), add=TRUE)
 
 ```
+
+> **Answer:**
+
+\> ?Gestation
+
+\> View(Gestation)
+
+\> myglm <- glm(smoke>0 ~ wt, data=Gestation, family=binomial)
+
+\> summary(myglm)
+
+ </BR>
+
+Call:
+glm(formula = smoke > 0 ~ wt, family = binomial, data = Gestation)
+
+Deviance Residuals:
+    Min       1Q   Median       3Q      Max  
+-1.8055  -1.2341   0.8984   1.0765   1.4810  
+
+Coefficients:
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  2.416983   0.402280   6.008 1.88e-09 ***
+wt              -0.018277   0.003311  -5.520 3.39e-08 ***
 
 <!-- Q1. End -->
 
@@ -74,266 +96,67 @@ library(tidyverse)
 
 
 ## 2.
-> _[Question]_
 
-[Response]
+I wasn't sure how to do this because I didn't have the original glm object. However, I knew you could calculate it by hand but wasn't fast enough to figure out that I had to use the match equation below.
 
 ```{r}
 # a.
+# COMMENT: I wasn't sure how to do this because I didn't have the original glm object. However, I knew you could calculate it by hand but wasn't fast enough to figure out that I had to use the match equation below.
 
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+# > I'm commenting this out because it won't compile otherwise.
+# estimated_eb1 <- exp(ges.glm$coefficients["wt"])
+# estimated_eb1
 ```
 
+> **Answer:**
+
+To compute a predicted value we can either do the calculation by hand:
+
+$$
+P(Y_i = 1|\, x_i) = \frac{e^{\beta_0 + \beta_1 x_i}}{1+e^{\beta_0 +
+\beta_1 x_i}} = \pi_i
+$$
+
+`exp(-6.6035 + 0.3070*25) / (1 + exp(-6.6035 + 0.3070*25)) = 0.7448821`
+
+Or we can use the predict function:
+
+`predict(glmObject, data.frame(mpg=25), type="response")`
+
+However, in this particular case, we don't have access to the "glmObject" that created the summary output, so we can only compute the answer by hand.
 <!-- Q2. End -->
 
 
 
 
 
-
-
-
-
-
 ## 3.
-> _[Question]_
 
-[Response]
+I didn't quite get to this.
+
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
 
 ```
+
+> **Answer:**
+
+To intepret the effect of mpg (the x-variable) on the odds, we compute exp(0.3070), which gives the value of eb1 . See the Overview page of Logistic Regression for an explanation.
+
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)   
+(Intercept)  -6.6035     2.3514  -2.808  0.00498
+mpg             0.3070     0.1148   2.673  0.00751
+
+ 
+
+Since exp(0.3070) = 1.359341, we find that the odds of a success, i.e., that Yi =1 increases by 35.9341%, which rounds to 36% for every 1 unit increase in x.
+
+Notices that the 35.9341 came from 1.359341. If you have 1.36 of what you originally had, then you increased by 0.36 or 36%.
 
 <!-- Q3. End -->
 
 
 
-
-
-
-
-
-
-
-## 4.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q4. End -->
-
-
-
-
-
-
-
-
-
-
-## 5.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q5. End -->
-
-
-
-
-
-
-
-
-
-
-## 6.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q6. End -->
-
-
-
-
-
-
-
-
-
-
-## 7.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q7. End -->
-
-
-
-
-
-
-
-
-
-
-## 8.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q8. End -->
-
-
-
-
-
-
-
-
-
-
-## 9.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q9. End -->
-
-
-
-
-
-
-
-
-
-
-## 10.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q10. End -->
 
 
 <!-- Questions End -->

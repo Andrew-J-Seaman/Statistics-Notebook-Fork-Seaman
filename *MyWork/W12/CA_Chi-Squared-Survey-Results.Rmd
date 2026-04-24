@@ -2,10 +2,10 @@
 title: "Chi Squared Survey Results"
 subtitle: "Class Activity"
 author: "Andrew Seaman"
-date: "2025-MM-DD"
+date: "03/25/2026"
 output: 
   html_document:
-    theme: journal
+    theme: flatly
     toc: true
     toc_float: true
     code_folding: hide
@@ -15,24 +15,105 @@ output:
 <!-- SETUP: -->
 <!-- ------ -->
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+## Setup
 
+<!-- IMPORTS -->
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-# Load libraries
-library(mosaic)
-library(DT)
-library(pander)
-library(tidyverse)
+# Libraries
+pacman::p_load(mosaic, DT, pander, haven, tidyverse)
+
+# Data
+gss2021 <- read_sas("../../Data/gss2021.sas7bdat")
 ```
 
+<!-- CUSTOMIZATIONS -->
+```{r setup, include=FALSE}
+# Chunk output
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
 <!-- Setup End -->
 
 
 
+<!-- ==================
+.     EXPLORATION
+=================== -->
 
-
+<!-- Column Names -->
+```{r}
+# > names(survey)
+#   [1] "YEAR"        "ID"          "WRKSLF"      "WRKGOVT"     "MARITAL"     "MARTYPE"     "DIVORCE"     "WIDOWED" 
+#   [9] "AGE"         "AGEKDBRN"    "EDUC"        "DEGREE"      "DIPGED"      "SEX"         "FAMDIF16"    "INCOM16" 
+#  [17] "BORN"        "GRANBORN"    "PRETEEN"     "INCOME"      "INCOME16"    "PARTYID"     "VOTE16"      "PRES16"  
+#  [25] "IF16WHO"     "POLVIEWS"    "NATSPAC"     "NATENVIR"    "NATHEAL"     "NATCITY"     "NATCRIME"    "NATDRUG" 
+#  [33] "NATEDUC"     "NATRACE"     "NATARMS"     "NATAID"      "NATFARE"     "NATROAD"     "NATSOC"      "NATMASS" 
+#  [41] "NATPARK"     "NATCHLD"     "NATSCI"      "NATENRGY"    "NATSPACY"    "NATENVIY"    "NATHEALY"    "NATCITYY"
+#  [49] "NATCRIMY"    "NATDRUGY"    "NATEDUCY"    "NATRACEY"    "NATARMSY"    "NATAIDY"     "NATFAREY"    "EQWLTH"  
+#  [57] "TAX"         "SPKATH"      "COLATH"      "LIBATH"      "SPKRAC"      "COLRAC"      "LIBRAC"      "SPKCOM"  
+#  [65] "COLCOM"      "LIBCOM"      "SPKMIL"      "COLMIL"      "LIBMIL"      "SPKHOMO"     "COLHOMO"     "LIBHOMO" 
+#  [73] "SPKMSLM"     "COLMSLM"     "LIBMSLM"     "CAPPUN"      "GUNLAW"      "RELIG"       "DENOM"       "OTHER"   
+#  [81] "JEW"         "FUND"        "ATTEND"      "PRAY"        "POPESPKS"    "FUND16"      "SPREL"       "COREL"   
+#  [89] "RACLIVE"     "AFFRMACT"    "WRKWAYUP"    "HAPPY"       "HAPMAR"      "HAPCOHAB"    "HEALTH"      "LIFE"    
+#  [97] "CONFINAN"    "CONBUS"      "CONCLERG"    "CONEDUC"     "CONFED"      "CONLABOR"    "CONPRESS"    "CONMEDIC"
+# [105] "CONTV"       "CONJUDGE"    "CONSCI"      "CONLEGIS"    "CONARMY"     "OBEY"        "POPULAR"     "THNKSELF"
+# [113] "WORKHARD"    "HELPOTH"     "SOCREL"      "SOCOMMUN"    "SOCFREND"    "SOCBAR"      "JOBLOSE"     "JOBFIND" 
+# [121] "SATJOB"      "RICHWORK"    "CLASS"       "RANK"        "SATFIN"      "FINALTER"    "FINRELA"     "WKSUB"   
+# [129] "WKSUBS"      "WKSUP"       "WKSUPS"      "UNION"       "UNION1"      "PARSOL"      "ABDEFECT"    "ABNOMORE"
+# [137] "ABHLTH"      "ABPOOR"      "ABRAPE"      "ABSINGLE"    "ABANY"       "CHLDIDEL"    "PILLOK"      "SEXEDUC" 
+# [145] "PREMARSX"    "TEENSEX"     "XMARSEX"     "HOMOSEX"     "PORNLAW"     "XMOVIE"      "SPANKING"    "LETDIE1" 
+# [153] "SUICIDE1"    "SUICIDE2"    "SUICIDE3"    "SUICIDE4"    "POLHITOK"    "POLABUSE"    "POLMURDR"    "POLESCAP"
+# [161] "POLATTAK"    "FEAR"        "OWNGUN"      "PISTOL"      "SHOTGUN"     "RIFLE"       "ROWNGUN"     "HUNT"    
+# [169] "HUNT1"       "NEWS"        "TVHOURS"     "FORM"        "FECHLD"      "FEPRESCH"    "FEFAM"       "RACDIF1" 
+# [177] "RACDIF2"     "RACDIF3"     "RACDIF4"     "HELPPOOR"    "HELPNOT"     "HELPSICK"    "HELPBLK"     "GOD"     
+# [185] "REBORN"      "SAVESOUL"    "WLTHWHTS"    "WLTHBLKS"    "WLTHHSPS"    "WORKWHTS"    "WORKBLKS"    "WORKHSPS"
+# [193] "INTLWHTS"    "INTLBLKS"    "INTLHSPS"    "LIVEBLKS"    "MARBLK"      "MARASIAN"    "MARHISP"     "MARWHT"  
+# [201] "RACWORK"     "DISCAFF"     "YOUSUP"      "SPWKSUP"     "FEJOBAFF"    "DISCAFFM"    "FEHIRE"      "RELPERSN"
+# [209] "SPRTPRSN"    "COMPUSE"     "WEBMOB"      "EMAILMIN"    "EMAILHR"     "USEWWW"      "WWWHR"       "WWWMIN"  
+# [217] "DISRSPCT"    "POORSERV"    "NOTSMART"    "AFRAIDOF"    "THREATEN"    "QUALLIFE"    "HLTHPHYS"    "HLTHMNTL"
+# [225] "SATSOC"      "ACTSSOC"     "PHYSACTS"    "EMOPROBS"    "FATIGUE"     "WRKSLFFAM"   "NEXTGEN"     "TOOFAST" 
+# [233] "ADVFRONT"    "SCIBNFTS"    "BALPOS"      "BALNEG"      "VIRUSES"     "INTEDUC"     "INTSCI"      "INTECON" 
+# [241] "INTTECH"     "SCIENTGO"    "SCIENTHE"    "SCIENTBE"    "POSSLQ"      "POSSLQY"     "MARCOHAB"    "ENDSMEET"
+# [249] "OPWLTH"      "OPPARED"     "OPEDUC"      "OPHRDWRK"    "OPKNOW"      "OPCLOUT"     "OPRACE"      "OPRELIG" 
+# [257] "OPSEX"       "GOODLIFE"    "INEQUAL5"    "PAYDOC"      "PAYCLERK"    "PAYEXEC"     "PAYUNSKL"    "PAYCABNT"
+# [265] "GIVDOC"      "GIVCLERK"    "GIVEXEC"     "GIVUNSKL"    "GIVCABNT"    "INCGAP"      "GOVEQINC"    "GOVUNEMP"
+# [273] "TAXRICH"     "TAXSHARE"    "CONWLTH"     "CONCLASS"    "CONUNION"    "CONAGE"      "LDCGAP"      "LDCTAX"  
+# [281] "RICHHLTH"    "RICHEDUC"    "PAYRESP"     "PAYEDTRN"    "PAYCHILD"    "PAYDOWEL"    "SOCTYPE1"    "SOCTYPE2"
+# [289] "MARHOMO"     "MEOVRWRK"    "RELACTIV"    "CANTRUST"    "RELIGINF"    "PRIVENT"     "POSTMAT1"    "POSTMAT2"
+# [297] "SCIGRN"      "GRNECON"     "HARMSGRN"    "GRNPROG"     "GRWTHELP"    "GRWTHARM"    "GRNPRICE"    "GRNTAXES"
+# [305] "GRNSOL"      "TOODIFME"    "IHLPGRN"     "CARSGEN"     "RECYCLE"     "GRNGROUP"    "GRNSIGN"     "GRNMONEY"
+# [313] "GRNDEMO"     "IMPGRN"      "OTHSSAME"    "GRNEXAGG"    "TOPPROB1"    "TOPPROB2"    "TRUST5"      "GRNCON"  
+# [321] "ENPRBUS"     "HELPHARM"    "GRNEFFME"    "TEMPGEN1"    "BUSGRN"      "PEOPGRN"     "NOBUYGRN"    "IMPORTS" 
+# [329] "POWRORGS"    "LETIN1A"     "PARTNERS"    "MATESEX"     "FRNDSEX"     "ACQNTSEX"    "PIKUPSEX"    "PAIDSEX" 
+# [337] "OTHERSEX"    "SEXSEX"      "SEXFREQ"     "NUMWOMEN"    "NUMMEN"      "PARTNRS5"    "SEXSEX5"     "EVPAIDSX"
+# [345] "EVSTRAY"     "CONDOM"      "RELATSEX"    "EVIDU"       "IDU30"       "EVCRACK"     "CRACK30"     "HIVTEST" 
+# [353] "HIVTEST1"    "HIVTEST2"    "SEXORNT"     "REALINC"     "CONINC"      "HISPANIC"    "VETYEARS"    "DWELOWN" 
+# [361] "COHORT"      "MARCOHRT"    "ZODIAC"      "MODE"        "LETDIE1Y"    "BALLOT"      "VERSION"     "ISSP"    
+# [369] "FORMWT"      "OVERSAMP"    "SPANSELF"    "SPANINT"     "VSTRAT"      "VPSU"        "WRKGOVT1"    "WRKGOVT2"
+# [377] "SPKATHY"     "LIBATHY"     "SPKRACY"     "LIBRACY"     "SPKCOMY"     "COLCOMY"     "LIBCOMY"     "SPKMILY" 
+# [385] "LIBMILY"     "SPKHOMOY"    "LIBHOMOY"    "SPKMSLMY"    "LIBMSLMY"    "POLHITOKY"   "POLABUSEY"   "POLATTAKY"
+# [393] "RACEACS1"    "RACEACS2"    "RACEACS3"    "RACEACS4"    "RACEACS5"    "RACEACS6"    "RACEACS7"    "RACEACS8"
+# [401] "RACEACS9"    "RACEACS10"   "RACEACS11"   "RACEACS12"   "RACEACS13"   "RACEACS14"   "RACEACS15"   "RACEACS16"
+# [409] "ABDEFECTG"   "ABNOMOREG"   "ABHLTHG"     "ABPOORG"     "ABRAPEG"     "ABSINGLEG"   "SUICIDE1G"   "SUICIDE2G"
+# [417] "SUICIDE3G"   "SUICIDE4G"   "SEXBIRTH1"   "SEXNOW1"     "GOVEQINC1"   "IMMLIMIT"    "TRRESRCH"    "TRMEDIA" 
+# [425] "TRBUSIND"    "TRLEGIS"     "CLMTCAUS"    "CLMTWRLD"    "CLMTUSA"     "NATURDEV"    "INDUSGEN1"   "CHEMGEN1"
+# [433] "WATERGEN1"   "GENEGEN1"    "NUKEGEN1"    "ENJOYNAT"    "ACTIVNAT"    "PLANETRP"    "CARHR"       "EATMEAT" 
+# [441] "NUMROOMS"    "AIRPOLLU"    "WTRPOLLU"    "EXWEATHR"    "OPBRIBES"    "MKT1"        "RESPINEQ"    "GOVINEQ1"
+# [449] "GOVINEQ2"    "INEQMAD"     "MIGRPOOR"    "CONIMM"      "RANK1"       "RANK16"      "RANK10FUT"   "FAIRDIST"
+# [457] "CONTPOOR"    "CONTRICH"    "ENDSME12"    "SKIPMEAL"    "CLASS1"      "RATEPAIN1"   "NORELGSP"    "EVANGCLX"
+# [465] "EVANGCLY"    "RELIGIMP"    "RELIDIMP"    "RELIDESC"    "RELIDWE"     "RELIDINS"    "BIBLAUTH"    "EVNGELZE"
+# [473] "SINSACRI"    "CHRSTSAV"    "SPRTCONNCT"  "SPRTLRGR"    "SPRTPURP"    "MDITATE1"    "GRTWRKS"     "FREEMIND"
+# [481] "DECEVIDC"    "ADVFMSCI"    "PROCHOIC"    "PROLIFE"     "GODUSA"      "GOVCHRST"    "BUSEQINC"    "TRDUNIO1"
+# [489] "BOARDREP"    "UPWAGES"     "LIMITPAY"    "PRFTIMPV"    "GOVFNANC"    "DCLINDUS"    "GOVFNAID"    "HIVAFRAID"
+# [497] "HIVIMMRL"    "HIVDSCRM"    "PTNRORNT"    "PTNRSXBRTH"  "PTNRSXNOW"   "POLTRTBLK"   "POLTRTBLKY"  "POLTRTB1"
+# [505] "POLTRTB1Y"   "POLTRTB2"    "POLTRTB2Y"   "POLTRTHSP"   "POLTRTHSPY"  "POLTRTB3"    "POLTRTB3Y"   "POLTRTB4"
+# [513] "POLTRTB4Y"   "DEFUND"      "STRVBIAS"    "STRVBIASY"   "RACESURV17"  "CONPHARVAC"  "CONPHARVACY" "CONFEDVAC"
+# [521] "CONFEDVACY"  "WTSSPS"      "WTSSNRPS"    "USWARYV"     "PRAYERV"     "COURTSV"     "DISCAFFWV"   "RACOPENV"
+# [529] "GETAHEADV"   "DIVLAWV"     "HELPFULV"    "FAIRV"       "TRUSTV"      "AGEDV"       "GRASSV"      "RELITENV"
+# [537] "BIBLEV"      "POSTLIFEV"   "KIDSSOLV"    "USCITZNV"    "FUCITZNV"    "FEPOLV"      "SCIBNFTSV"   "USWARYNV"
+# [545] "PRAYERNV"    "COURTSNV"    "DISCAFFWNV"  "RACOPENNV"   "GETAHEADNV"  "DIVLAWNV"    "HELPFULNV"   "FAIRNV"  
+# [553] "TRUSTNV"     "AGEDNV"      "GRASSNV"     "RELITENNV"   "BIBLENV"     "POSTLIFENV"  "KIDSSOLNV"   "USCITZNNV"
+# [561] "FUCITZNNV"   "FEPOLNV"     "SCIBNFTSNV"  "ABANYG"      "FILEVERSION"
+```
 
 
 
@@ -42,24 +123,57 @@ library(tidyverse)
 <!-- QUESTIONS: -->
 <!-- ---------- -->
 
-## 1.
-> _[Question]_
+## 1. `Select()` Variables and `Table()`
 
-[Response]
+> Choose two variables to look at
+
+1) `GRASSV` - *Do you think the use of marijuana should be made legal or not?*
+    a. 1 = Should be legal
+    b. 2 = Should not be legal
+2) `SEX` - *CODE RESPONDENT'S SEX*
+    a. 1 = MALE
+    b. 2 = FEMALE
 
 ```{r}
-# a.
+# Select the columns you've chosen
+gss2021_SELECT <- gss2021 %>%
+  select(GRASSV, SEX)
+```
 
+> Table the two variables
 
-# b.
+**`(1) Marijuana Legality`**
+```{r}
+tab_marijuana <- table(gss2021$GRASSV)
+tab_marijuana                                                               # --> OUTPUT: 1.1
+# 1 = Should be legal
+# 2 = Should not be legal
 
+# FILTER OUT: 
+# -100 = .i: Inapplicable
+# -99 = .n: No answer
+# -98 = .d: Do not Know/Cannot Choose
+# -97 = .s: Skipped on Web
+```
 
-# c.
+**`(1) Sex`**
+```{r}
+tab_sex <- table(gss2021$SEX)
+tab_sex                                                                     # --> OUTPUT: 1.2
+# 1 = MALE
+# 2 = FEMALE
 
+# FILTER OUT: 
+# -100 = .i: Inapplicable
+# -99 = .n: No answer
+# -98 = .d: Do not Know/Cannot Choose
+# -97 = .s: Skipped on Web
+```
 
-# d.
-
-
+**`(1) Combined - Marijuana Legality:Sex`**
+```{r}
+tab_combined <- table(gss2021$GRASSV, gss2021$SEX)
+tab_combined                                                                # --> OUTPUT: 1.3
 ```
 
 <!-- Q1. End -->
@@ -73,24 +187,73 @@ library(tidyverse)
 
 
 
-## 2.
-> _[Question]_
+## 2. `Filter()` the Bad Values and `Table()`
 
-[Response]
+> Filter the Data for the good values
 
+We'll filter all non-responses including:
+
+<!-- FILTER the bad values -->
 ```{r}
-# a.
+# Filter
+gss2021_FILTER <- gss2021_SELECT %>%
+  filter(GRASSV %in% c(1, 2), # 1 = Should be legal, 2 = Should not be legal
+         SEX %in% c(1, 2))    # 1 = MALE, 2 = FEMALE
 
 
-# b.
+# Make Dataframe of non-reponses
+non_response <- data.frame(
+  id = c(-100, -99, -98, -97),
+  value = c(
+    ".i: Inapplicable", 
+    ".n: No answer", 
+    ".d: Do not Know/Cannot Choose", 
+    ".s: Skipped on Web"
+  )
+)
+
+non_response %>% pander(caption = "Non-Responses (Bad Values)",)                         # --> OUTPUT (*single use)
+```
+
+<!--  
+PANDER(): ALL PARAMETERS
+pander(
+  x,
+  caption = NULL,
+  digits = panderOptions("digits"),
+  round = panderOptions("round"),
+  style = panderOptions("style"),
+  missing = panderOptions("missing"),
+  justify = panderOptions("table.alignment"),
+  split.table = panderOptions("table.split.table"),
+  split.cells = panderOptions("table.split.cells"),
+  keep.trailing.zeros = panderOptions("keep.trailing.zeros")
+)
+-->
 
 
-# c.
+> Table the data with the good values
 
+**`(2) Marijuana Legality`**
+```{r}
+tab_marijuana <- table(gss2021_FILTER$GRASSV)
+tab_marijuana                                                               # --> OUTPUT: 2.1
+# 1 = Should be legal
+# 2 = Should not be legal
+```
 
-# d.
+**`(2) Sex`**
+```{r}
+tab_sex <- table(gss2021_FILTER$SEX)
+tab_sex                                                                     # --> OUTPUT: 2.2
+# 1 = MALE
+# 2 = FEMALE
+```
 
-
+**`(2) Combined - Marijuana Legality:Sex`**
+```{r}
+tab_combined <- table(gss2021_FILTER$GRASSV, gss2021_FILTER$SEX)
+tab_combined                                                                # --> OUTPUT: 2.3
 ```
 
 <!-- Q2. End -->
@@ -104,23 +267,42 @@ library(tidyverse)
 
 
 
-## 3.
-> _[Question]_
+## 3. Rename rows/columns, and `Table()`
 
-[Response]
+> Rename the <u>good values</u>
+
 ```{r}
-# a.
+# Marijuana
+names(tab_marijuana) <- c("Should be legal", "Should not be legal")
+
+# Sex
+names(tab_sex) <- c("MALE", "FEMALE")
+
+# Combined
+rownames(tab_combined) <- c("Should be legal", "Should not be legal")
+colnames(tab_combined) <- c("MALE", "FEMALE")
+```
 
 
-# b.
+> Table the data with the <u>renamed values</u>
 
+**`(3) Marijuana Legality`**
+```{r}
+tab_marijuana %>% pander()                                                  # --> OUTPUT: 3.1
+# 1 = Should be legal
+# 2 = Should not be legal
+```
 
-# c.
+**`(3) Sex`**
+```{r}
+tab_sex %>% pander()                                                        # --> OUTPUT: 3.2
+# 1 = MALE
+# 2 = FEMALE
+```
 
-
-# d.
-
-
+**`(3) Combined - Marijuana Legality:Sex`**
+```{r}
+tab_combined %>% pander()                                                   # --> OUTPUT: 3.3.2
 ```
 
 <!-- Q3. End -->
@@ -134,24 +316,67 @@ library(tidyverse)
 
 
 
-## 4.
-> _[Question]_
+## 4. Barplot of cleaned, combined table
 
-[Response]
+> Melt the table into a data frame
+
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+# Melt table into a data frame
+melt_combined <- as.data.frame(tab_combined) %>% 
+  rename(
+    `Marijuana Legality` =  Var1,
+    Sex = Var2,
+    Frequency = Freq
+  )
 ```
+
+> Make a barplot with the new data frame
+
+```{r}
+# Color Scheme
+pallete_sex <- c("skyblue2", "pink2")
+bar_border <- c("red", "green")
+
+# Barplot: Frequency of opinion on `Marijuana Legality` by Sex
+ggplot(melt_combined, aes(x = `Marijuana Legality`, y = Frequency))+
+  # Barplot
+  geom_bar(stat = "identity", position = "dodge", aes(fill = Sex))+
+  
+  # Scales
+  scale_y_continuous(limits = c(0,500))   +
+  scale_fill_manual(values = pallete_sex) +
+  scale_color_manual(values = c("white", "white")) +
+  
+  # Themes
+  theme_bw() +
+  theme(
+    legend.position = c(0.8, 0.8),
+    legend.background = element_rect(fill = NULL, color = "black", linewidth = .5),
+    axis.title = element_text(size = 12)
+  ) +
+  
+  # Labels
+  labs(
+    title = "Women have stronger feelings about the legality of marijuana than men",
+    y = "Frequency of Opinion"
+  ) +
+  geom_label(
+    aes(label = Frequency, color = Sex),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3,
+    label.size = 0,
+    alpha = 0.8,
+    show.legend = FALSE,
+    fill = "black"
+  )
+  # coord_flip()
+```
+
+<!-- Source link: Indented and sized down -->
+<div style = "font-size: 12px; margin-left: 4em;">
+  ***Source:***
+  <a href="https://gssdataexplorer.norc.org/variables/vfilter">GSS Data Explorer</a>
+</div>
 
 <!-- Q4. End -->
 
@@ -164,24 +389,18 @@ library(tidyverse)
 
 
 
-## 5.
-> _[Question]_
+## 5. Chi-Squared Test
 
-[Response]
+Run a chi-squared test on your table with both variables in it to see if they are independent or associated with each other.
+
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+results <- chisq.test(tab_combined)
+results %>% pander(caption = "Chi-Squared Test Results")
 ```
+
+**Interpretation**
+
+The results do not appear significant in the slightest against a typical $\alpha = 0.05$.
 
 <!-- Q5. End -->
 
@@ -194,147 +413,37 @@ library(tidyverse)
 
 
 
-## 6.
-> _[Question]_
+## 6. Test Chi-Square Assumptions
 
-[Response]
+> Counts Tables
+
+### {.tabset .tabset-pills}
+
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+tab_combined <- chisq.test(tab_combined)
 ```
 
-<!-- Q6. End -->
+#### Observed
 
-
-
-
-
-
-
-
-
-
-## 7.
-> _[Question]_
-
-[Response]
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+pander(tab_combined$observed, caption="Observed Counts")
 ```
 
-<!-- Q7. End -->
+#### Expected
 
-
-
-
-
-
-
-
-
-
-## 8.
-> _[Question]_
-
-[Response]
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+pander(tab_combined$expected, caption="Expected Counts")
 ```
 
-<!-- Q8. End -->
+#### Residuals
 
-
-
-
-
-
-
-
-
-
-## 9.
-> _[Question]_
-
-[Response]
 ```{r}
-# a.
+pander(tab_combined$residuals, caption="Residuals", 
+       split.table=Inf)
 
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+barplot(t(tab_combined$residuals), beside=TRUE, legend.text=TRUE, xlim=c(0,60), 
+        cex.names=0.2)
 ```
-
-<!-- Q9. End -->
-
-
-
-
-
-
-
-
-
-
-## 10.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q10. End -->
-
 
 <!-- Questions End -->
 

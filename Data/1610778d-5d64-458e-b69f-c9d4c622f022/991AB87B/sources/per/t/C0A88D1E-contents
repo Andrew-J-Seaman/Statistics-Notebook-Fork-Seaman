@@ -1,0 +1,120 @@
+---
+title: "W02 - Gapminder Part 1"
+subtitle: "DS350 - Bro. Cannon"
+author: "Andrew Seaman"
+date: "01-17-2026"
+date-modified: "04-06-2026"
+format:
+  html:
+    code-fold: true
+    code-tools: true
+    toc: true
+    toc-fold: true
+    toc-depth: 6
+---
+
+<!-- IMPORTS -->
+```{r}
+# Libraries
+pacman::p_load(directlabels, DT, pander, tidyverse)
+
+# Data
+gap <- gapminder::gapminder
+```
+
+
+<!-- ——————————————————————————————————————————————————————————————————————————————————— -->
+
+
+## Data 
+:::{.panel-tabset}
+
+### Sample
+
+Selected by pseudo random methods, 5 rows show what the data may look like.
+
+```{r}
+# Pseduo random representative sample 
+slice_sample(gap, n = 5) %>% pander() #data type is 'list')
+```
+
+### Full
+
+```{r}
+datatable(gap)
+```
+
+:::
+
+
+<!-- ——————————————————————————————————————————————————————————————————————————————————— -->
+
+
+## Task 1 
+
+
+> ##### Instructions
+
+1. Use a .qmd file to recreate the graphic shown below using gapminder dataset from `library(gapminder)` (get them to match as closely as you can).
+    * Remove Kuwait from the data (explanation of why)
+    * Use library(tidyverse) to load ggplot2 and dplyr so that you can duplicate the plot below. (Hint: use + `theme_bw()` to get the proper formatting)
+    * `Use scale_y_continuous(trans = "sqrt")` to get the correct scale on the y-axis.
+    
+<img src="./gapminder_part_1_recreate_this.png" width=700px>
+
+> ##### Plot Recreation (*My Work*)
+
+<!--  
+  1) Data Cleaning, 
+  2) Graphic Recreation 
+-->
+```{r}
+#| label: "Plot Recreation"
+#| fig-width: 10
+#| fig-height: 4
+
+# 1) Data Cleaning:
+#     • Remove Kuwait 
+#     • Change the scale of `pop` (population) to 100k.
+gap2 <- gap %>% 
+  filter(country != "Kuwait") %>% 
+  mutate(
+    pop_k = pop / 100000
+  )
+
+
+# 2) Recreated Plot
+ggplot(gap2, aes(x = lifeExp, y = gdpPercap)) +
+    labs(
+    x = "Life Expectancy",
+    y = "GDP per Capita",
+    size = "Population (100k)",
+    color = "Continent"
+  ) +
+  geom_point(aes(size = pop_k, color = continent), alpha = 0.8) +
+  facet_wrap(~ year, nrow = 1) +
+  scale_y_continuous(trans = "sqrt") +
+  scale_size_continuous(range = c(.2, 3)) +
+  theme_bw() +
+  theme(
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 10),
+
+    legend.title = element_text(size = 9),
+    legend.text = element_text(size = 7),
+    legend.key.size = unit(0.45, "cm"),
+    legend.spacing.y = unit(0.1, "cm")
+  ) +
+  guides(
+    size = guide_legend(override.aes = list(size = c(1, 2, 3, 4, 5))),
+    color = guide_legend(override.aes = list(size = 3))
+  )
+```
+
+
+
+
+
+<!-- ========================= -->
+<!--     FILE END! THANKS!     -->
+<!-- ========================= -->

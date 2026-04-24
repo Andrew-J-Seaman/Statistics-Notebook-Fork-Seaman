@@ -2,341 +2,244 @@
 title: "Permutation Testing (Part 2)"
 subtitle: "Class Activity"
 author: "Andrew Seaman"
-date: "2025-MM-DD"
+date: "2026-04-06"
 output: 
   html_document:
-    theme: journal
+    # highlight-style: darkly 
+      # Highlight Styles:   cosmo (clean, modern), flatly, litera, minty, lux, sandstone, journal,
+      #                     darkly (dark mode), cyborg (very dark hacker vibes), github
+    theme: simplex  
+      # Themes:             default, bootstrap, cerulean, cosmo, darkly, flatly, journal, lumen,
+      #                     paper, readable, sandstone, simplex, spacelab, united, yeti
     toc: true
-    toc_float: true
-    code_folding: hide
+    # toc_float: true
+    code_folding: show
 ---
 
-<!-- ------ -->
-<!-- SETUP: -->
-<!-- ------ -->
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
+<!-- IMPORTS -->
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-# Load libraries
-library(mosaic)
-library(DT)
-library(pander)
-library(tidyverse)
+# Libraries
+pacman::p_load(mosaic, DT, pander, tidyverse)
 ```
 
-<!-- Setup End -->
+---
+
+<!-- ————————————————————————————————————————————————————————————————— -->
 
 
+## Approaches {.tabset .tabset-fade .tabset-pills}
 
+### T-Test
 
-
-
-
-
-
-
-<!-- ---------- -->
-<!-- QUESTIONS: -->
-<!-- ---------- -->
-
-## 1.
-> _[Question]_
-
-[Response]
-
+**Step 1**
+<!--
+# SOURCE: Stats Textbook & Class Activity
+-->
 ```{r}
-# a.
+i <- "> 1. First run the initial test and gain the test statistic:"
+# myTest <- t.test(extra ~ group, data = sleep, mu = 0)
+# observedTestStat <- myTest$statistic
 
+# > Data: Filter and keep only 4 & 8 cylinders
+df <- mtcars %>%
+  filter(cyl %in% c(4, 8)) %>% 
+  rename(
+    cylinder = cyl,
+    weight = wt
+  )
 
-# b.
+# > Run an initial t-test
+myTest <- t.test(weight ~ cylinder, data = df)
+myTest %>% pander()
 
-
-# c.
-
-
-# d.
-
-
+# > Get the test statistic
+observedTestStat <- myTest$statistic
+observedTestStat
 ```
 
-<!-- Q1. End -->
-
-
-
-
-
-
-
-
-
-
-## 2.
-> _[Question]_
-
-[Response]
-
+**Step 2**
 ```{r}
-# a.
+i <- "> 2. Now we run the permutations to create a distribution of test statistics"
 
+# N <- 2000
+# permutedTestStats <- rep(NA, N)
+# for (i in 1:N){
+#   permutedTest <- t.test(sample(extra) ~ group, data = sleep, mu = 0)
+#   permutedTestStats[i] <- permutedTest$statistic
+# }
 
-# b.
-
-
-# c.
-
-
-# d.
-
-
+N <- 2000
+permutedTestStats <- rep(NA, N)
+for (i in 1:N) {
+  permutedTest <- t.test(sample(weight) ~ cylinder, data = df, mu = 0)
+  permutedTestStats[i] <- permutedTest$statistic
+}
 ```
 
-<!-- Q2. End -->
+##### {.tabset .tabset-fade .tabset-pills}
+
+###### Hide
 
 
+###### Show Output
 
-
-
-
-
-
-
-
-## 3.
-> _[Question]_
-
-[Response]
+2000 permutations simulating the data we need to be able to see if the number of cylinders is independent from the weight of the vehicle or not.
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+permutedTestStats
 ```
 
-<!-- Q3. End -->
+####
 
-
-
-
-
-
-
-
-
-
-## 4.
-> _[Question]_
-
-[Response]
+**Step 3**
 ```{r}
-# a.
+i <- "> 3. Now we show a histogram of that distribution"
 
+# hist(permutedTestStats, col = "skyblue")
+# abline(v = observedTestStat, col = "red", lwd = 3)
 
-# b.
-
-
-# c.
-
-
-# d.
-
-
+hist(permutedTestStats, col = "skyblue",
+     xlim = range(c(permutedTestStats, observedTestStat)))
+abline(v= observedTestStat, col = "red", lwd = 3)
 ```
 
-<!-- Q4. End -->
-
-
-
-
-
-
-
-
-
-
-## 5.
-> _[Question]_
-
-[Response]
+**Step 4**
 ```{r}
-# a.
+i <- "> 4.1/3. Greater-Than p-value: Not the correct one in this case."
+# sum(permutedTestStats >= observedTestStat)/N
+sum(permutedTestStats >= observedTestStat)/N
 
 
-# b.
+i <- "> 4.2/3. Less-Than p-value: Not the correct one for this data"
+# sum(permutedTestStats <= observedTestStat)/N
+sum(permutedTestStats <= observedTestStat)/N
 
 
-# c.
-
-
-# d.
-
-
+i <- "> 4.3/3. Two-Sided p-value: This is the one we want based on our alternative hypothesis."
+# 2*sum(permutedTestStats <= observedTestStat)/N
+2*sum(permutedTestStats <= observedTestStat)/N
 ```
 
-<!-- Q5. End -->
+---
+
+<!-- ————————————————————————————————————————————————————————————————— -->
 
 
 
 
 
+### One-Way ANOVA
 
+Perform a One-way ANOVA using a permutation test.  Use the diamonds dataset and test whether the average price of the diamonds depends on the clarity.  Use the following psuedo code as a starting spot.  (Hint: because the diamonds dataset has 53,000 rows we start with a small N value)
 
-
-
-
-## 6.
-> _[Question]_
-
-[Response]
+<!-- One-Way ANOVA -->
 ```{r}
-# a.
+# SOURCE: Class Activity
+
+# > Data
+df <- diamonds
+
+#Step 1
+myTest <- aov(price ~ clarity, data = df)
+observedTestStat <- summary(myTest)[[1]]$`F value`[1]
 
 
-# b.
+#Step 2
+N <- 2000 #53000 - I've used: 500, 2000, 10000, and 53000 (which ran for about a minutes)
+permutedTestStats <- rep(NA, N)
+for (i in  1:N){
+  permutedTest <- aov(sample(price) ~ clarity, data = df)
+  permutedTestStats[i] <- summary(permutedTest)[[1]]$`F value`[1]
+}
 
-
-# c.
-
-
-# d.
-
-
+hist(permutedTestStats, col = "skyblue")
+abline(v=observedTestStat, col = "red", lwd = 3)
+  
+#Step 3
+sum(permutedTestStats >= observedTestStat)/N
+sum(permutedTestStats <= observedTestStat)/N
 ```
 
-<!-- Q6. End -->
-
-
-
-
-
-
-
-
-
-
-## 7.
-> _[Question]_
-
-[Response]
+**Observed Test Statistic:**
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+observedTestStat
 ```
 
-<!-- Q7. End -->
 
-
-
-
-
-
-
-
-
-
-## 8.
-> _[Question]_
-
-[Response]
+**TEMP TEST CHUNK! DELETE!**
 ```{r}
-# a.
+#     TEMP! DELETE THIS SOON! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<----------------------------- *******
+#
+#     
 
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+ggplot(diamonds, aes(x = price)) +
+  # geom_histogram() +                                  #1
+  
+  # geom_jitter(aes(y = clarity))                       #2
+  
+  # geom_density(aes(fill = clarity, alpha = .1))       #3
+  
+  geom_boxplot(aes(y = clarity)) +                    #4
+  coord_flip()
+  
+  # geom_violin(aes(y = clarity)) +                       #5
+  # coord_flip()
 ```
 
-<!-- Q8. End -->
+
+---
+
+<!-- ————————————————————————————————————————————————————————————————— -->
 
 
 
 
 
+### Logistic Regression
 
+Perform a Logistic Regression Test using a permutation test.  Use the SAT dataset (mosaic library) and test whether the likelihood of scoring above 1000 (sat > 1000) on the SAT depends on the expenditure per pupil (expend).  Use the following psuedo code as a starting spot.
 
-
-
-
-## 9.
-> _[Question]_
-
-[Response]
+<!-- Logistic Regression -->
 ```{r}
-# a.
+# SOURCE: Class Activity
 
+# > Data: filter and keep only two levels of 
+df <- SAT %>% 
+  mutate(
+    sat_dummy = ifelse(sat > 1000, 1, 0)
+  )
 
-# b.
+# #Step 1
+myTest <- glm(sat_dummy ~ expend, data = df, family = binomial)
+observedTestStat <- summary(myTest)[[12]][2,3]
 
+# #Step 2
+N <- 100
+permutedTestStats <- rep(NA, N)
+for (i in  1:N){
+  permuted_df <- df %>% 
+    mutate(sat_dummy = sample(sat_dummy))
+  
+  permutedTest <- glm(sat_dummy ~ expend, data = permuted_df, family = binomial)
+  permutedTestStats[i] <- summary(permutedTest)[[12]][2,3]
+}
 
-# c.
+hist(permutedTestStats, col = "skyblue")
+abline(v=observedTestStat, col = "red", lwd = 3)
 
-
-# d.
-
-
+#Step 3
+sum(permutedTestStats >= observedTestStat)/N
+sum(permutedTestStats <= observedTestStat)/N
 ```
 
-<!-- Q9. End -->
-
-
-
-
-
-
-
-
-
-
-## 10.
-> _[Question]_
-
-[Response]
+**Observed Test Statistic:**
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+observedTestStat
 ```
 
-<!-- Q10. End -->
+---
 
+<!-- ————————————————————————————————————————————————————————————————— -->
 
-<!-- Questions End -->
 
 
 

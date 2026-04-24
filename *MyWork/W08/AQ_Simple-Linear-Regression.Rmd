@@ -5,7 +5,7 @@ author: "Andrew Seaman"
 date: "2025-MM-DD"
 output: 
   html_document:
-    theme: journal
+    theme: simplex
     toc: true
     toc_float: true
     code_folding: hide
@@ -15,16 +15,9 @@ output:
 <!-- SETUP: -->
 <!-- ------ -->
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 # Load libraries
-library(mosaic)
-library(DT)
-library(pander)
-library(tidyverse)
+pacman::p_load(DT, pander, mosaic, tidyverse)
 
 df <- KidsFeet
 ```

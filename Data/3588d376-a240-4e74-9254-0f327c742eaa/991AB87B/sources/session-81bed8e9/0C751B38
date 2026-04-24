@@ -1,0 +1,29 @@
+{
+    "id": "0C751B38",
+    "path": "~/Desktop/Semester/1.MATH325/Repository/Statistics-Notebook-Fork-Seaman/Analyses/Linear Regression/MyMultipleLinearRegression.Rmd",
+    "project_path": "Analyses/Linear Regression/MyMultipleLinearRegression.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1775889024958.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "chunk_output_type": "console",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "170,16",
+        "scrollLine": "0",
+        "docOutlineVisible": "0",
+        "docOutlineSize": "147"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1771968470,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1771968470,
+    "read_only": false,
+    "read_only_alternatives": []
+}

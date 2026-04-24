@@ -11,55 +11,52 @@ output:
     code_folding: hide
 ---
 
-<!-- ------ -->
-<!-- SETUP: -->
-<!-- ------ -->
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
+<!-- IMPORTS -->
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-# Load libraries
-library(mosaic)
-library(DT)
-library(pander)
-library(tidyverse)
+#libraries
+pacman::p_load(mosaic, DT, pander, tidyverse)
 ```
 
-<!-- Setup End -->
 
 
 
 
 
+<!-- QUESTIONS -->
 
 
 
 
-
-<!-- ---------- -->
-<!-- QUESTIONS: -->
-<!-- ---------- -->
 
 ## 1.
-> _[Question]_
 
-[Response]
+Perform an appropriate test in R to determine if the dominant hand of children is related to the season of the year they are born in.
+
+Select the answer showing the P-value of your test. (Note that this test is not quite appropriate for these data. Due to the small sample sizes, the average expected count is only 4.875, but all expected counts are above 1.)
 
 ```{r}
-# a.
+#data
+Kids2 <- KidsFeet %>%     
+  mutate(        
+    season = case_when(            
+      birthmonth %in% c(12,1,2) ~ "Winter",            
+      birthmonth %in% c(3,4,5) ~ "Spring",            
+      birthmonth %in% c(6,7,8) ~ "Summer",            
+      birthmonth %in% c(9,10,11) ~ "Fall"        
+   )    
+)
 
+#table
+hand <- table(Kids2$domhand, Kids2$season)
 
-# b.
+#chi-squared test
+chis.hand <- chisq.test(hand)
 
+#view test results
+chis.hand %>% pander()
 
-# c.
-
-
-# d.
-
-
+#residuals
+chis.hand$residuals %>% pander()
 ```
 
 <!-- Q1. End -->
@@ -68,29 +65,15 @@ library(tidyverse)
 
 
 
-
-
-
-
-
 ## 2.
 > _[Question]_
 
-[Response]
+When performing a chi-squared test, there are always two ways to display the barplot of the table of observed counts.
+Which of the plots listed below depicts the same set of observed counts that are depicted in this plot?
 
 ```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
+#plot
+barplot(hand, beside=TRUE, legend.text=TRUE, args.legend=list(x = "topleft", bty="n"))
 ```
 
 <!-- Q2. End -->
@@ -99,28 +82,35 @@ library(tidyverse)
 
 
 
-
-
-
-
-
 ## 3.
-> _[Question]_
 
-[Response]
+Perform an appropriate test to determine if wind speeds of over 12 mph are more or less likely to occur on hot days (days over 80 degrees F) than on other days.
+
+Select the best interpretation of the test results from the list of options below.
+
 ```{r}
-# a.
+#data
+air2 <- airquality %>%
+    mutate(Wind12 = case_when(Wind > 12 ~ "Windy", TRUE ~ "Calm"),
+           Temp80 = case_when(Temp > 80 ~ "Hot", TRUE ~ "Fair"))
 
+#table
+wind <- table(air2$Wind12, air2$Temp80)
 
-# b.
+#chi-squared test
+chis.wind <- chisq.test(wind)
 
+#view test results
+chis.wind %>% pander()
 
-# c.
+#residuals
+chis.wind$residuals %>% pander()
 
+```
 
-# d.
-
-
+```{r}
+#plot
+barplot(wind, beside=TRUE, legend.text=TRUE, args.legend=list(x = "topleft", bty="n"))
 ```
 
 <!-- Q3. End -->
@@ -129,214 +119,8 @@ library(tidyverse)
 
 
 
-
-
-
-
-
-## 4.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q4. End -->
-
-
-
-
-
-
-
-
-
-
-## 5.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q5. End -->
-
-
-
-
-
-
-
-
-
-
-## 6.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q6. End -->
-
-
-
-
-
-
-
-
-
-
-## 7.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q7. End -->
-
-
-
-
-
-
-
-
-
-
-## 8.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q8. End -->
-
-
-
-
-
-
-
-
-
-
-## 9.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q9. End -->
-
-
-
-
-
-
-
-
-
-
-## 10.
-> _[Question]_
-
-[Response]
-```{r}
-# a.
-
-
-# b.
-
-
-# c.
-
-
-# d.
-
-
-```
-
-<!-- Q10. End -->
-
-
 <!-- Questions End -->
+
 
 
 

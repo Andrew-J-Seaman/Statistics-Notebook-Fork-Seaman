@@ -1,39 +1,28 @@
 ---
 title: "Randomization Testing"
 subtitle: "Skills Quiz"
-author: "STUDENT NAME"
-date: "YYYY-MMM-DD"
+author: "Andrew Seaman"
+date: "2026-04-09"
 output: 
   html_document:
-    theme: journal
+    theme: simplex
     code_folding: hide
-editor_options: 
-  chunk_output_type: console
+    toc: true
+    toc_depth: 6
+    collapsed: true
+    smooth_scroll: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
+<!-- IMPORTS -->
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
-# Load libraries. Modify list as needed.
-library(tidyverse)
-library(mosaic)
-library(mosaicData)
-library(DT)
-library(pander)
+#libraries
+pacman::p_load(mosaic, car, DT, pander, tidyverse)
 ```
-
 
 <!-- START: ALL -->
-# Questions
-
-
-
-
 
 <!-- START: Main Tabset -->
-# {.tabset .tabset-pills .tabset-fade}
+# Pages {.tabset .tabset-pills .tabset-fade}
 
 
 
@@ -42,44 +31,32 @@ library(pander)
 <!-- START: Summary -->
 ## Summary
 
-----
 
 ### Introduction
 [Introduction text]
 
 <BR />
 
-### Questions [# of questions]
+
+### Questions
 
 ##### Q1
-\[summary]
+A quick check before proceeding.
 
 ##### Q2
-\[summary]
+Match the null hypothesis to the test.
 
 ##### Q3
-\[summary]
+
 
 ##### Q4
-\[summary]
+Freebie.
 
 ##### Q5
-\[summary]
+
 
 ##### Q6
-\[summary]
 
-##### Q7
-\[summary]
-
-##### Q8
-\[summary]
-
-##### Q9
-\[summary]
-
-##### Q10
-\[summary]
 
 <!-- END: Summary -->
 
@@ -89,71 +66,9 @@ library(pander)
 
 <!-- START: Q1 -->
 ## Q1
+**Question:** Have you completed both class activities for this week? 
 
-----
-
-##### Introduction
-[Introduction text]
-
-##### 1.1
-```{r}
-# 1.1
-
-```
-
-##### 1.2
-```{r}
-# 1.2
-
-```
-
-##### 1.3
-```{r}
-# 1.3
-
-```
-
-##### 1.4
-```{r}
-# 1.4
-
-```
-
-##### 1.5
-```{r}
-# 1.5
-
-```
-
-##### 1.6
-```{r}
-# 1.6
-
-```
-
-##### 1.7
-```{r}
-# 1.7
-
-```
-
-##### 1.8
-```{r}
-# 1.8
-
-```
-
-##### 1.9
-```{r}
-# 1.9
-
-```
-
-##### 1.10
-```{r}
-# 1.10
-
-```
+**Answer:** Yes, I have.
 
 <!-- END: Q1 -->
 
@@ -162,69 +77,28 @@ library(pander)
 
 
 <!-- START: Q2 -->
-## Q2
+## Q2 
 
-----
+Match the following Tests to their Null Hypothesis.
 
-##### 2.1
-```{r}
-# 2.1
+1. **Independent Samples t Test**
+$$H_0: \mu1=\mu2$$
+ 
 
-```
+2. **Wilcoxon Rank Sum Test**
+$$H_0: \text{difference in medians} = 0$$
 
-##### 2.2
-```{r}
-# 2.2
+3. **Chi-squared Test**
+$$H_0: \text{the two variables are not associated}$$
 
-```
+4. **ANOVA**
+$$H_0:\mu1=\mu2=\mu3=\mu4$$
+ 
+5. **Wilcoxon Signed-Rank Test**
+$$H_0: \text{median of the differences} = 0$$
 
-##### 2.3
-```{r}
-# 2.3
-
-```
-
-##### 2.4
-```{r}
-# 2.4
-
-```
-
-##### 2.5
-```{r}
-# 2.5
-
-```
-
-##### 2.6
-```{r}
-# 2.6
-
-```
-
-##### 2.7
-```{r}
-# 2.7
-
-```
-
-##### 2.8
-```{r}
-# 2.8
-
-```
-
-##### 2.9
-```{r}
-# 2.9
-
-```
-
-##### 2.10
-```{r}
-# 2.10
-
-```
+6. **Paired Samples t Test**
+$$H_0: \mu d=0$$
 
 <!-- END: Q2 -->
 
@@ -235,66 +109,74 @@ library(pander)
 <!-- START: Q3 -->
 ## Q3
 
-----
-
 ##### 3.1
+Run the following codes in R.
+
+Here we have the first five rows of the random data we just generated, sampled, and assembled into a workable dataset.
 ```{r}
 # 3.1
 
+#random data
+set.seed(1140411) #allows us each to get the same set of random values
+
+#samples
+sample1 <- rnorm(30, 69, 2.5) #get a random sample of n=30 normally distributed values with mu=69 and sigma=2.5
+
+sample2 <- rnorm(30, 69, 2.5) #get another random sample of n=30 normally distributed values with mu=69 and sigma=2.5
+
+#data frame
+theData <- data.frame(values = c(sample1,sample2), group = rep(c(1,2), each=30)) #load the random samples into a data set
+
+#head
+head(theData, 5) %>% pander()
 ```
 
 ##### 3.2
+Boxplot
 ```{r}
 # 3.2
 
+#plot
+boxplot(values ~ group, data = theData)
 ```
 
 ##### 3.3
+We will run an Independent Samples T-test.
 ```{r}
 # 3.3
 
+#independent samples t-test
+myTest <- t.test(values ~ group, data = theData, mu = 0)
+myTest %>% pander()
 ```
 
 ##### 3.4
+Observed Test Statistic.
 ```{r}
 # 3.4
 
+observedTestStat <- myTest$statistic
+observedTestStat %>% pander()
 ```
 
 ##### 3.5
+Permutation test.
 ```{r}
 # 3.5
 
-```
+#permutation test
+N <- 2000      
+permutedTestStats <-  rep(NA, N)
+for  (i in 1:N ) {
+   permutedTest <- t.test(sample(values) ~ group, data = theData, my = 0)
 
-##### 3.6
-```{r}
-# 3.6
-
-```
-
-##### 3.7
-```{r}
-# 3.7
-
-```
-
-##### 3.8
-```{r}
-# 3.8
-
-```
-
-##### 3.9
-```{r}
-# 3.9
-
-```
-
-##### 3.10
-```{r}
-# 3.10
-
+   permutedTestStats[i]  <-  permutedTest$statistic
+  
+}
+hist(permutedTestStats)
+abline(v=observedTestStat)
+sum(permutedTestStats >= observedTestStat)/N
+sum(permutedTestStats <= observedTestStat)/N
 ```
 
 <!-- END: Q3 -->
@@ -305,68 +187,9 @@ library(pander)
 
 <!-- START: Q4 -->
 ## Q4
+This question has been deleted due to an important error in the question.
 
-----
-
-##### 4.1
-```{r}
-# 4.1
-
-```
-
-##### 4.2
-```{r}
-# 4.2
-
-```
-
-##### 4.3
-```{r}
-# 4.3
-
-```
-
-##### 4.4
-```{r}
-# 4.4
-
-```
-
-##### 4.5
-```{r}
-# 4.5
-
-```
-
-##### 4.6
-```{r}
-# 4.6
-
-```
-
-##### 4.7
-```{r}
-# 4.7
-
-```
-
-##### 4.8
-```{r}
-# 4.8
-
-```
-
-##### 4.9
-```{r}
-# 4.9
-
-```
-
-##### 4.10
-```{r}
-# 4.10
-
-```
+If you would like credit for this question, click "Yes" below:
 
 <!-- END: Q4 -->
 
@@ -375,68 +198,48 @@ library(pander)
 
 
 <!-- START: Q5 -->
-## Q5
-
-----
+## Q5 {.active}
 
 ##### 5.1
 ```{r}
 # 5.1
 
+#table
+table(SaratogaHouses$fuel)
 ```
 
 ##### 5.2
 ```{r}
 # 5.2
 
+#kruskal-wallis test
+kruskalTest <- kruskal.test(price ~ fuel, data = SaratogaHouses)
+kruskalTest %>% pander()
 ```
 
 ##### 5.3
 ```{r}
 # 5.3
 
+#plot
+boxplot(price ~ fuel, data=SaratogaHouses)
+
+stripchart(price ~ fuel, data=SaratogaHouses)
+
+barchart(price ~ fuel, data=SaratogaHouses)
 ```
 
 ##### 5.4
 ```{r}
 # 5.4
 
-```
+#highest median price for fuel=gas
+highest_median_prices <- SaratogaHouses %>% 
+  group_by(fuel) %>% 
+  summarize(median_price = median(price))
 
-##### 5.5
-```{r}
-# 5.5
-
-```
-
-##### 5.6
-```{r}
-# 5.6
-
-```
-
-##### 5.7
-```{r}
-# 5.7
-
-```
-
-##### 5.8
-```{r}
-# 5.8
-
-```
-
-##### 5.9
-```{r}
-# 5.9
-
-```
-
-##### 5.10
-```{r}
-# 5.10
-
+#view
+highest_median_prices %>% pander()
 ```
 
 <!-- END: Q5 -->
@@ -448,12 +251,12 @@ library(pander)
 <!-- START: Q6 -->
 ## Q6
 
-----
-
 ##### 6.1
 ```{r}
 # 6.1
 
+#plot
+xyplot(len ~ dose, groups=supp, data=ToothGrowth, type=c("p","a"), auto.key=TRUE)
 ```
 
 ##### 6.2
@@ -515,292 +318,6 @@ library(pander)
 
 
 
-
-<!-- START: Q7 -->
-## Q7
-
-----
-
-##### 7.1
-```{r}
-# 7.1
-
-```
-
-##### 7.2
-```{r}
-# 7.2
-
-```
-
-##### 7.3
-```{r}
-# 7.3
-
-```
-
-##### 7.4
-```{r}
-# 7.4
-
-```
-
-##### 7.5
-```{r}
-# 7.5
-
-```
-
-##### 7.6
-```{r}
-# 7.6
-
-```
-
-##### 7.7
-```{r}
-# 7.7
-
-```
-
-##### 7.8
-```{r}
-# 7.8
-
-```
-
-##### 7.9
-```{r}
-# 7.9
-
-```
-
-##### 7.10
-```{r}
-# 7.10
-
-```
-
-<!-- END: Q7 -->
-
-
-
-
-
-<!-- START: Q8 -->
-## Q8
-
-----
-
-##### 8.1
-```{r}
-# 8.1
-
-```
-
-##### 8.2
-```{r}
-# 8.2
-
-```
-
-##### 8.3
-```{r}
-# 8.3
-
-```
-
-##### 8.4
-```{r}
-# 8.4
-
-```
-
-##### 8.5
-```{r}
-# 8.5
-
-```
-
-##### 8.6
-```{r}
-# 8.6
-
-```
-
-##### 8.7
-```{r}
-# 8.7
-
-```
-
-##### 8.8
-```{r}
-# 8.8
-
-```
-
-##### 8.9
-```{r}
-# 8.9
-
-```
-
-##### 8.10
-```{r}
-# 8.10
-
-```  
-
-<!-- END: Q8 -->
-
-
-
-
-
-<!-- START: Q9 -->
-## Q9
-
-----
-
-##### 9.1
-```{r}
-# 9.1
-
-```
-
-##### 9.2
-```{r}
-# 9.2
-
-```
-
-##### 9.3
-```{r}
-# 9.3
-
-```
-
-##### 9.4
-```{r}
-# 9.4
-
-```
-
-##### 9.5
-```{r}
-# 9.5
-
-```
-
-##### 9.6
-```{r}
-# 9.6
-
-```
-
-##### 9.7
-```{r}
-# 9.7
-
-```
-
-##### 9.8
-```{r}
-# 9.8
-
-```
-
-##### 9.9
-```{r}
-# 9.9
-
-```
-
-##### 9.10
-```{r}
-# 9.10
-
-``` 
-
-<!-- END: Q9 -->
-
-
-
-
-
-<!-- START: Q10 -->
-## Q10
-
-----
-
-##### 10.1
-```{r}
-# 10.1
-
-```
-
-##### 10.2
-```{r}
-# 10.2
-
-```
-
-##### 10.3
-```{r}
-# 10.3
-
-```
-
-##### 10.4
-```{r}
-# 10.4
-
-```
-
-##### 10.5
-```{r}
-# 10.5
-
-```
-
-##### 10.6
-```{r}
-# 10.6
-
-```
-
-##### 10.7
-```{r}
-# 10.7
-
-```
-
-##### 10.8
-```{r}
-# 10.8
-
-```
-
-##### 10.9
-```{r}
-# 10.9
-
-```
-
-##### 10.10
-```{r}
-# 10.10
-
-```
-
-<!-- END: Q10 -->
-
-
-
-
-
-#
 
 <!-- END: Main Tabset -->
 

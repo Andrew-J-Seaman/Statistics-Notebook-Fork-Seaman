@@ -1,15 +1,19 @@
 ---
-title: "Consulting"
-subtitle: "W11 Analysis"
+title: "Heaven On Earth Massage"
+subtitle: "BYU-Idaho Consulting Project (MATH325)"
 author: "Andrew Seaman"
-date: "2025-06-09"
-output: html_document
----
-
+date: "03/16/2026"
+output:
+  html_document:
+    theme: flatly
+    code_folding: hide
+    toc: true
+    toc_float: true
+    toc-depth: 6
 ---
 
 <!--******************************************************
-LAST UPDATED: 2025-06-09
+LAST UPDATED: 03/30/2026
 BY: Andrew Seaman
 *******************************************************-->
 
@@ -17,46 +21,45 @@ BY: Andrew Seaman
 .                          SETUP                    
 -------------------------------------------------------->
 
-<!-- Today's date -->
-```{r, warning=FALSE, echo=FALSE}
-# Utility: copy today's date to clipboard, only when editing
-if (interactive()) {
-  clipr::write_clip(Sys.Date())
-}
-
-# Next, paste after 'LAST UPDATED' above
-```
-
-<!-- Format HTML Output -->
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-<!-- Libraries -->
-```{r}
+```{r imports, message=FALSE, warning=FALSE}
 # Import libraries
-library(ggplot2)
-library(mosaic)
-library(DT)
-library(pander)
-library(tidyverse)
+pacman::p_load( ggplot2, ggridges, readr, mosaic, directlabels, DT, lubridate, pander, plotly, tidyverse)
+
+# Import dataset
+mssg <- read_csv("../Data/massage.csv", col_types = "dcccdcdcddddd") %>% 
+  rename(
+    week = "Week",
+    date = "Date",
+    staff = "Staff",
+    client = "Client",
+    description = "Description",
+    length_min = "Length (min)", 
+    base_amt = "Base Amt ($)", 
+    discount_pct = "Discount (%)", 
+    discount_amt = "Discount ($)", 
+    paid_amt = "Paid Amt ($)", 
+    tip_amt = "Tip Amt ($)", 
+    total_amt = "Total Amt ($)"
+  ) %>% 
+  # Add calculated columns & Clean data types
+  mutate(
+    length_hr = length_min/60,
+    discount_pct = readr::parse_number(discount_pct) / 100,
+    day = substr(date,1,3),
+    date = lubridate::mdy(substr(date, 5, nchar(date)))
+  )
 ```
 
+## {.tabset .tabset-pills .tabset-fade}
 
-
-
-
-
-
-
-
+### Hide
 
 <!-------------------------------------------------------
 .                          PLANNING                    
 -------------------------------------------------------->
 
 <!-- Analysis Ideas -->
-```{r}
+```{r, echo=FALSE, include=FALSE}
 # ============================================================
 #                           INTRO
 # ============================================================
@@ -97,27 +100,417 @@ library(tidyverse)
 
 <!-- Chosen Analysis -->
 
+</BR>
+
+---
+
+
+### Data Exploration {.tabset .tabset-pills .tabset-fade}
+
+**(EXPLORE THE DATA TO FIND SOMETHING TO ANALYZE)**
+
+#### Uniqe values
+
+Show all unique values by column.
+
+```{r}
+unique_column_value_lists <- mssg %>%
+  summarise(across(everything(), ~ paste(unique(.), collapse = ", "))) %>% 
+  pander()
+
+unique_column_value_lists
+```
+
+</BR>
+
+Show a table of counts of unique values by column.
+
+```{r}
+# table_of_counts_all_columns <- mssg %>%
+#   tidyr::pivot_longer(everything(), names_to = "column", values_to = "value") %>%
+#   dplyr::count(column, value)
+# 
+# table_of_counts_all_columns
+```
+
+</BR>
+
+#### Plots
+
+Pepare a table of counts and convert it into a dataframe. (This is most likley a very inefficient way to wrangle this data).
+
+```{r}
+tbl_counts <- table(mssg$staff, mssg$week)
+df_counts <- as.data.frame(tbl_counts) %>% 
+  rename(
+    staff = Var1,
+    week = Var2,
+    count = Freq
+  ) %>%
+  mutate(
+    staff = as.character(staff),
+    weeks = as.numeric(week)
+  )
+```
+
+**Plot 1:** Horizontal line plot of massages given per week from 2025-2026.
+```{r}
+# 1 col, 5 rows
+ggplot(df_counts, aes(x=week, y=count, color=staff, group=1))+
+  geom_line()+
+  facet_wrap(~staff, ncol = 1)
+```
+
+**Plot 2:** Vertical line plot of massages given per week from 2025-2026.
+```{r}
+# 5 cols, 1 row
+ggplot(df_counts, aes(x=week, y=count, color=staff, group=1))+
+  geom_line()+
+  facet_wrap(~staff, ncol = 5)+
+  coord_flip()
+```
+
+**Plot 3:** Ridge plot of massages given per week from 2025-2026.
+```{r}
+# Ridge Plot
+# ggplot(df_counts, aes(x=week, y=staff, fill ))+
+#   geom_density_ridges()
+
+
+ggplot(mssg, aes(x=week, y=staff, fill = staff))+
+  geom_density_ridges()+
+  theme_ridges()+
+  geom_text(aes(label= count(week)))
+```
+
+**Plot 4:** Clean ridge plot marking the mean and median of massages given in 2025-2026.
+```{r, fig.height=8, fig.width = 10, fig.align="center"}
+mssg_clean <- mssg %>%
+  filter(!is.na(staff), !is.na(week))
+
+week_counts <- mssg_clean %>%
+  count(staff, week)
+
+max_week <- max(mssg$week)
+fill_colors <- palette.colors(n = 5, palette = palette.pals()[8]) 
+
+# FAVORITES: ["Tableau 10", "", "", "", ""]
+#  [1] "R3"              "R4"              "ggplot2"         "Okabe-Ito"       "Accent"          "Dark 2"         
+#  [7] "Paired"          "Pastel 1"        "Pastel 2"        "Set 1"           "Set 2"           "Set 3"          
+# [13] "Tableau 10"      "Classic Tableau" "Polychrome 36"   "Alphabet"  
+
+ggplot(mssg_clean, aes(x = week, y = staff, fill = staff)) +
+  labs(
+    title = "Seasonal Highs and Lows Are Apparent For All Massage Therapists",
+    subtitle = "Stats: red circle for mean; green point for median",
+    x = "Week",
+    y = "Massage Therapist"
+  ) +
+  
+  # Geom - Section:
+  geom_vline(xintercept = c(12, 24, 36, 48), linetype = "dotted", show.legend = FALSE) +
+  geom_density_ridges(
+    scale = .9,
+    alpha = 0.7,
+    color = "black",
+    rel_min_height = .001
+  ) +
+  geom_point(
+    # pch = 20, 
+    shape = 21,
+    size = 7, 
+    alpha = .4,
+    stat = "summary",
+    fun = mean,
+    color = "red"
+  ) +
+  geom_point(
+    pch = 20, 
+    size = 7, 
+    alpha = .4,
+    stat = "summary",
+    fun = median,
+    color = "green"
+  ) +
+  geom_label(
+    aes(label = staff), 
+    stat = "summary", 
+    fun = median, 
+    vjust = -.8, 
+    hjust = c(4.7, 7.3, 2.9, 4, 4.6)) +
+  
+  annotate("text", x = c(6,18,30,42), y = .5, label = c("Q1", "Q2", "Q3", "Q4"))+
+  
+  # Scale - Section:
+  scale_x_continuous(limits = c(1,53), breaks = seq(1,53, by = 1)) +
+  scale_fill_manual(values = fill_colors) +
+  
+  # Theme - Section:
+  theme_ridges() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(size = 6),
+    axis.text.y = element_blank(),
+    # NOTE: `theme_ridges()` may be interfering with the following line of code.
+    # axis.title = element_text(hjust = 0.5),
+    axis.title.x = element_text(hjust = 0.5),
+    axis.title.y = element_text(hjust = 0.5)
+  )
+
+# NOTE: values to pass to `stat = ...`
+# 
+# "identity"    # use raw y values
+# "count"       # count rows (default for geom_bar)
+# "bin"         # histograms
+# "density"     # density curves
+# "smooth"      # smoothing models
+# "summary"     # summary stats (mean, etc.)
+# "summary_bin" # binned summaries
+# "boxplot"     # boxplot stats
+# "ydensity"    # violin plots
+# "ecdf"        # empirical CDF
+# "qq"          # QQ plot
+# "qq_line"
+
+# NOTE: values to pass to `fun = ...`
+# 
+# fun = mean
+# fun = median
+# fun = sum
+# fun = min
+# fun = max
+# fun = length      # count
+# fun = sd
+# fun = var
+```
+
+**Plot 5:** Vertical bar plot of massages given per week from 2025-2026.
+```{r, fig.height=8, fig.width = 10, fig.align="center"}
+# Bar chart - Get a clearer picture of what the ridgeplot is showing
+ggplot(mssg_clean, aes(x = week, fill = staff)) +
+  labs(
+    title = "Massive gap from week 4 to week 26 YoY (2025-2026).",
+    subtitle = "Note: Emma and Luke were terminated",
+    x = "Week",
+    y = "Count",
+    caption = "Figure #. shows how many clients each massage therapist saw and when by week number throughout the year."
+  ) +
+  geom_bar(position = "dodge") +
+  scale_x_continuous(limits = c(1,53), breaks = seq(1,53, by = 1)) +
+  scale_fill_manual(values = fill_colors)+
+  facet_wrap(~staff, ncol = 5) +
+  theme(
+    legend.position = "none",
+    axis.text = element_text(size = 6)
+  ) +
+  coord_flip()
+```
+
+**Plot 6:** Line plot with slight line curve for massages given per week from 2025-2026.
+```{r}
+df <- mssg_clean %>% 
+  group_by(week, staff) %>% 
+  summarise(count = n())
+
+ggplot(df, aes(x=week, y=count, color=staff))+
+  # geom_line()
+  geom_smooth(se = FALSE, method = "glm", method.args = list(family = "poisson"))+
+  geom_jitter(width = 0, alpha = .5)
+  
+```
+
+
+</BR>
+
+*(EXPLANATION)*
+
+```{r}
+# (Description)
+
+```
+
+</BR>
+
+*(EXPLANATION)*
+
+```{r}
+# (Description)
+
+```
+
+</BR>
+
+*(EXPLANATION)*
+
+```{r}
+# (Description)
+
+```
+
+---
 
 
 
 
 
 
+## Background 
+
+(BACKGROUND TEXT)
+
+[Heaven On Earth](https://www.massagebook.com/therapists/sleepyridge?src=external) is a growing massage therapy spa located in Orem, Utah. Services begin with a basic massage of 60 minutes and can increase in time and intensity as needed. Add-on services are also provided upon request. An important focus emphasized by each masseuse is to come in with a specific intention. That may mean one focuses on overall wellness, stress relief, pain and tension release, etc.
+
+</BR>
+
+---
+
+
+
+## Question and Hypothesis
+
+When it comes time to pay for the services provided what motivates individuals to add a tip? Could the most important lever be simply which masseuse provided the services?
+
+*(STATE HYPOTHESIS)...ANOVA?*
+
+$$
+H_0:
+\\
+H_a:
+\\
+\alpha = 0.10 \ \text{(90% CL)}
+$$
+
+</BR>
+
+
+
+## Data
+
+```{r libs, message=FALSE, warning=FALSE}
+# View Data
+datatable(
+  mssg,
+  options = list(
+    lengthMenu = list(c(5, 10, -1), c("5", "10", "All"))
+  )
+)
+```
+
+---
+
+</BR>
+
+
+
+## Fitting the Model
+
+*(STATISTICAL TESTING)*
+
+```{r}
+# (Statistical Test Name...tbd)
+
+```
+
+*(INTERPRETATION)*
+
+</BR>
+
+
+
+> ### Diagnostic Plots
+
+*(TEST FOR MODEL ASSUMPTIONS)*
+
+```{r}
+# Diagnostic Plots
+
+```
+
+*(INTERPRETATION)*
+
+</BR>
+
+---
+
+
+
+## Graphics
+
+**(GRAPHICS, NUMERICAL SUMMARIES, AND INTERPRETATION)**
+
+<!-- G1 -->
+*(INTERPRETATION)*
+
+```{r}
+# Graphic 1
+
+```
+
+<!-- NS1 -->
+*(INTERPRETATION)*
+
+```{r}
+# Numerical Summary 1
+
+```
+
+</BR>
+
+<!-- G2 -->
+*(INTERPRETATION)*
+
+```{r}
+# Graphic 2
+
+```
+
+<!-- NS2 -->
+*(INTERPRETATION)*
+
+```{r}
+# Numerical Summary 2
+
+```
+
+</BR>
+
+<!-- G3 -->
+*(INTERPRETATION)*
+
+```{r}
+# Graphic 3
+
+```
+
+<!-- NS3 -->
+*(INTERPRETATION)*
+
+```{r}
+# Numerical Summary 3
+
+```
+
+</BR>
+
+---
+
+
+
+
+
+## Conclusion
+
+---
+
+*(SUMMARY)*
 
 
 
 
 
 
+</BR></BR></BR></BR></BR>
 
-
-
-
-
-
-
-
-
-
-
-
+<!-- ======== -->
+<!-- FILE END -->
+<!-- ======== -->
